@@ -1,0 +1,102 @@
+###################################################
+###             Fichier de paramètres           ###
+###################################################
+
+
+##################################################
+###                   Scénario                 ###
+##################################################
+
+# Choix de la condition initiale. Choix possibles
+#       1 --> f = 2(y-y^2+x-x^2), g = 0, h = 0
+#       2 --> f = g = h = sin(x) + cos(y)
+#       3 --> f = exp(-(x-Lx/2)^2)*exp(-(y-Ly/2)^2)*cos(pi/2*t), g = 0, h = 1
+Scenario
+1
+
+
+##################################################
+###             Paramètres physiques           ###
+##################################################
+
+# Coefficient de diffusion
+DiffusionCoefficient
+1.0
+
+
+#################################################
+###             Paramètres spatiaux           ###
+#################################################
+
+# Dimensions du domaine rectangulaire
+xmin
+0.
+xmax
+1.
+ymin
+0.
+ymax
+1.
+
+# Nombre de noeuds de discrétisation pour chaque direction
+# On ne compte pas les noeuds de bords, donc Nx * Ny est le nb d'inconnues.
+Nx
+3
+Ny
+3
+
+
+##################################################
+###             Paramètres temporels           ###
+##################################################
+
+# Schéma en temps. Valeurs possibles :
+#        ExplicitEuler
+#        ImplicitEuler
+TimeScheme
+ExplicitEuler
+
+# Paramètres temporels.
+# CFL est utilisée pour adapter le pas de temps dans le cas de Euler explicite
+InitialTime
+0.
+FinalTime
+3
+TimeStep
+1e-3
+CFL
+0.8
+
+
+#############################################################################
+###             Paramètres Solveur Linéaire (Gradient Conjugué)           ###
+#############################################################################
+
+# Nombre d'itérations max
+MaxIterations
+150
+
+# Tolerance pour le test d'arrêt
+Tolerance
+1e-5
+
+# Sauvegarde de la norme des résidus dans un fichier
+IsSaveResidual
+1
+
+# File in which the residual norm is to be written
+ResidualFile
+norme_residus.dat
+
+
+###############################################################
+###             Sauvegarde/Stockage des résultats           ###
+###############################################################
+
+# Répertoire où stocker les résultats
+ResultsDir
+results
+
+# Fréquence de sauvegarde de la solution numérique (en nb d'itérations)
+SaveFrequency
+50
