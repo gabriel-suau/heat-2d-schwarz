@@ -134,6 +134,14 @@ void DataFile::readDataFile()
     {
       dataFile >> _saveFrequency;
     }
+    if (proper_line.find("nSubdomains") != std::string::npos)
+    {
+      dataFile >> _nSubdomains;
+    }
+    if (proper_line.find("nOverlapLine") != std::string::npos)
+    {
+      dataFile >> _nOverlapLine;
+    }
   }
 
   // Calcul des pas d'espace
