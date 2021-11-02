@@ -41,9 +41,9 @@ ymax
 # Nombre de noeuds de discrétisation pour chaque direction
 # On ne compte pas les noeuds de bords, donc Nx * Ny est le nb d'inconnues.
 Nx
-3
+150
 Ny
-3
+150
 
 
 ##################################################
@@ -54,14 +54,14 @@ Ny
 #        ExplicitEuler
 #        ImplicitEuler
 TimeScheme
-ExplicitEuler
+ImplicitEuler
 
 # Paramètres temporels.
 # CFL est utilisée pour adapter le pas de temps dans le cas de Euler explicite
 InitialTime
 0.
 FinalTime
-3
+2.
 TimeStep
 1e-3
 CFL
@@ -78,7 +78,7 @@ MaxIterations
 
 # Tolerance pour le test d'arrêt
 Tolerance
-1e-5
+1e-12
 
 # Sauvegarde de la norme des résidus dans un fichier
 IsSaveResidual

@@ -46,34 +46,34 @@ void TimeScheme::saveCurrentSolution(std::string &fileName) const
   double xmin(_DF->getxMin()), ymin(_DF->getyMin());
   double dx(_DF->getDx()), dy(_DF->getDy());
 
-  // outputFile << "# vtk DataFile Version 3.0" << std::endl;
-  // outputFile << "sol" << std::endl;
-  // outputFile << "ASCII" << std::endl;
-  // outputFile << "DATASET STRUCTURED_POINTS" << std::endl;
-  // outputFile << "DIMENSIONS " << Nx << " " << Ny << " " << 1 << std::endl;
-  // outputFile << "ORIGIN " << xmin << " " << ymin << " " << 0 << std::endl;
-  // outputFile << "SPACING " << dx << " " << dy << " " << 1 << std::endl;;
-  // outputFile << "POINT_DATA " << Nx*Ny << std::endl;
-  // outputFile << "SCALARS sol float" << std::endl;
-  // outputFile << "LOOKUP_TABLE default" << std::endl;
-
-  // for(int j=0; j<Ny; ++j)
-  //   {
-  //     for(int i=0; i<Nx; ++i)
-  //       {
-  //         outputFile << _Sol[i+j*Nx] << " ";
-  //       }
-  //     outputFile << std::endl;
-  //   }
+  outputFile << "# vtk DataFile Version 3.0" << std::endl;
+  outputFile << "sol" << std::endl;
+  outputFile << "ASCII" << std::endl;
+  outputFile << "DATASET STRUCTURED_POINTS" << std::endl;
+  outputFile << "DIMENSIONS " << Nx << " " << Ny << " " << 1 << std::endl;
+  outputFile << "ORIGIN " << xmin << " " << ymin << " " << 0 << std::endl;
+  outputFile << "SPACING " << dx << " " << dy << " " << 1 << std::endl;;
+  outputFile << "POINT_DATA " << Nx*Ny << std::endl;
+  outputFile << "SCALARS sol float" << std::endl;
+  outputFile << "LOOKUP_TABLE default" << std::endl;
 
   for(int j=0; j<Ny; ++j)
     {
       for(int i=0; i<Nx; ++i)
         {
-          double x(xmin + (i+1) * dx), y(ymin + (j+1) * dy);
-          outputFile << x << " " << y << " " << _Sol[i+j*Nx] << std::endl;
+          outputFile << _Sol[i+j*Nx] << " ";
         }
+      outputFile << std::endl;
     }
+
+  // for(int j=0; j<Ny; ++j)
+  //   {
+  //     for(int i=0; i<Nx; ++i)
+  //       {
+  //         double x(xmin + (i+1) * dx), y(ymin + (j+1) * dy);
+  //         outputFile << x << " " << y << " " << _Sol[i+j*Nx] << std::endl;
+  //       }
+  //   }
 }
 
 void TimeScheme::solve()
