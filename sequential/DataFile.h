@@ -80,6 +80,8 @@ public:
   std::string getResFile() const { return _resFile; };
   double getDiffCoeff() const { return _diffCoeff; };
   int getSaveFrequency() const { return _saveFrequency; };
+  int getnSubsomains() const { return _saveFrequency; };
+  int getnOverlapLines() const { return _saveFrequency; };
 
   // Print the parameters
   void printData() const;
