@@ -68,9 +68,6 @@ protected:
   DVector _exactSol; ///< Exact solution.
 
 public:
-  /*! @brief Constructs an empty Function object. */
-  Function();
-
   /*! @brief Constructs a Function object using a DataFile object. */
   Function(DataFile* DF);
 
@@ -79,9 +76,6 @@ public:
 
   /*! @brief Initializes an already constructed Function object. */
   void Initialize();
-
-  /*! @brief Initializes an empty constructed Function object. */
-  void Initialize(DataFile* DF);
 
   /*! @brief Builds the source term. */
   void buildSourceTerm(double t);
@@ -118,7 +112,6 @@ class Function1 : public Function
 {
 public:
   // Constructeur
-  Function1();
   Function1(DataFile* DF);
 
   // Fonctions
@@ -139,7 +132,6 @@ class Function2 : public Function
 {
 public:
   // Constructeur
-  Function2();
   Function2(DataFile* DF);
 
   // Fonctions
@@ -160,7 +152,6 @@ class Function3 : public Function
 {
 public:
   // Constructeur
-  Function3();
   Function3(DataFile* DF);
 
   // Fonctions

@@ -39,39 +39,10 @@
 //--------------------------------------------------//
 //--------------------Base Class--------------------//
 //--------------------------------------------------//
-Function::Function()
-{
-}
-
 
 Function::Function(DataFile* DF):
   _DF(DF), _xmin(DF->getxMin()), _ymin(DF->getyMin()), _xmax(DF->getxMax()), _ymax(DF->getyMax()), _Lx(DF->getLx()), _Ly(DF->getLy()), _dx(_DF->getDx()), _dy(_DF->getDy()), _Nx(DF->getNx()), _Ny(DF->getNy()), _Sol0(localSize), _sourceTerm(localSize), _exactSol(localSize)
 {
-}
-
-
-/*!
- * @param [in] DF A pointer to a DataFile object.
- * @deprecated This method could be useful if we decided to construct an empty Function object.
- * But we never use it in this code...
- */
-void Function::Initialize(DataFile* DF)
-{
-  _DF = DF;
-  _xmin = DF->getxMin();
-  _ymin = DF->getyMin();
-  _xmax = DF->getxMax();
-  _ymax = DF->getyMax();
-  _Lx = DF->getLx();
-  _Ly = DF->getLy();
-  _dx = DF->getDx();
-  _dy = DF->getDy();
-  _Nx = DF->getNx();
-  _Ny = DF->getNy();
-  _Sol0.resize(localSize);
-  _sourceTerm.resize(localSize);
-  _exactSol.resize(localSize);
-  this->Initialize();
 }
 
 
@@ -186,11 +157,6 @@ void Function::saveSourceTerm(std::string& fileName) const
 //--------------------------------------------------//
 //--------------------Function 1--------------------//
 //--------------------------------------------------//
-Function1::Function1():
-  Function()
-{
-}
-
 
 Function1::Function1(DataFile* DF):
   Function(DF)
@@ -230,11 +196,6 @@ void Function1::buildExactSolution(double t)
 //--------------------------------------------------//
 //--------------------Function 2--------------------//
 //--------------------------------------------------//
-Function2::Function2():
-  Function()
-{
-}
-
 
 Function2::Function2(DataFile* DF):
   Function(DF)
@@ -274,11 +235,6 @@ void Function2::buildExactSolution(double t)
 //--------------------------------------------------//
 //--------------------Function 3--------------------//
 //--------------------------------------------------//
-Function3::Function3():
-  Function()
-{
-}
-
 
 Function3::Function3(DataFile* DF):
   Function(DF)
