@@ -163,6 +163,14 @@ void DataFile::readDataFile()
         {
           dataFile >> _CFL;
         }
+      if (proper_line.find("nSubdomains") != std::string::npos)
+        {
+          dataFile >> _nSubdomains;
+        }
+      if (proper_line.find("nOverlap") != std::string::npos)
+        {
+          dataFile >> _nOverlap;
+        }
       if (proper_line.find("xmin") != std::string::npos)
         {
           dataFile >> _xmin;

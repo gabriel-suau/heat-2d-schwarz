@@ -65,7 +65,7 @@ private:
   double _CFL; ///< CFL number. It is used with the Explicit Euler scheme to ensure its stability.
 
   // Spatial parameters
-  int _saveFrequency, _nSubdomains, _nOverlap
+  int _nSubdomains, _nOverlap
   double _xmin, _xmax, _ymin, _ymax; ///< Boundaries of the domain.
   double _Lx, _Ly; ///< Lengths of the domain in the x and y directions.
   int _Nx, _Ny; ///< Number of nodes (or unknowns) in the x and y directions.
