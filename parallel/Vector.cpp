@@ -3,14 +3,14 @@
  *
  * @brief Defines a Vector class.
  *
- * @authors Gabriel Suau, Remi Pegouret, Geoffrey Lebaud
+ * @authors Gabriel Suau, Lucas Trautmann, Geoffrey Lebaud
  *
  * @version 0.1.0
  *
  * @copyright © 2021 Gabriel Suau
- * @copyright © 2021 Remi Pegouret
+ * @copyright © 2021 Lucas Trautmann
  * @copyright © 2021 Geoffrey Lebaud
- * 
+ *
  * @copyright This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -112,7 +112,7 @@ void DVector::print() const
  *
  * @return a reference to os (so that we can chain the << operators).
  *
- * @deprecated This operator was only used for debugging purposes. It is not used 
+ * @deprecated This operator was only used for debugging purposes. It is not used
  * in the final version of the code.
  */
 std::ostream& operator<< (std::ostream &os, const DVector& v)

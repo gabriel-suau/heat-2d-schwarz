@@ -3,14 +3,14 @@
  *
  * @brief Defines a class representing the discrete laplacian matrix.
  *
- * @authors Gabriel Suau, Remi Pegouret, Geoffrey Lebaud
+ * @authors Gabriel Suau, Lucas Trautmann, Geoffrey Lebaud
  *
  * @version 0.1.0
  *
  * @copyright © 2021 Gabriel Suau
- * @copyright © 2021 Remi Pegouret
+ * @copyright © 2021 Lucas Trautmann
  * @copyright © 2021 Geoffrey Lebaud
- * 
+ *
  * @copyright This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -73,7 +73,7 @@ void Laplacian::Initialize()
 }
 
 /*!
- * @details The discrete laplacian matrix is very sparse (block tridiagonal), so 
+ * @details The discrete laplacian matrix is very sparse (block tridiagonal), so
  * only the strictly necessary operations are performed for this matrix-vector product.
  *
  * @param x DVector multiplied by the matrix.
@@ -199,9 +199,9 @@ DVector Laplacian::solveConjGrad(const DVector& b, const DVector& x0, double tol
         {
           std::cout << termcolor::green << "SOLVER::GC::SUCCESS : The GC method converged in " << k << " iterations ! Residual L2 norm = " << beta << std::endl;
           std::cout << termcolor::reset;
-        } 
+        }
     }
 #endif
-  
+
   return x;
 }

@@ -4,14 +4,14 @@
  *
  * @brief Define a class representing a Data file (contains all the parameters of the simulation).
  *
- * @authors Gabriel Suau, Remi Pegouret, Geoffrey Lebaud
+ * @authors Gabriel Suau, Lucas Trautmann, Geoffrey Lebaud
  *
  * @version 0.1.0
  *
  * @copyright © 2021 Gabriel Suau
- * @copyright © 2021 Remi Pegouret
+ * @copyright © 2021 Lucas Trautmann
  * @copyright © 2021 Geoffrey Lebaud
- * 
+ *
  * @copyright This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -63,7 +63,7 @@ void DataFile::Initialize(const std::string& fileName)
 
 
 /*!
- * @details Removes everything after a possible #, replaces tabulation by spaces, 
+ * @details Removes everything after a possible #, replaces tabulation by spaces,
  * replaces multiple spaces by one space, removes any leading space.
  *
  * @param [in] line The line to clean.
@@ -88,7 +88,7 @@ std::string DataFile::cleanLine(std::string &line)
 
 
 /*!
- * @details Main method of this class. It reads the data file fileName, and assign the values to the 
+ * @details Main method of this class. It reads the data file fileName, and assign the values to the
  * parameters. It also performs checks to ensure the values entered by the user in the data file
  * are correct.
  */
@@ -101,7 +101,7 @@ void DataFile::readDataFile()
       if (MPI_Rank == 0)
         {
           std::cout << termcolor::red << "ERROR::DATAFILE : Unable to open file " << _fileName << std::endl;
-          std::cout << termcolor::reset; 
+          std::cout << termcolor::reset;
         }
       MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
     }
@@ -111,11 +111,11 @@ void DataFile::readDataFile()
       if (MPI_Rank == 0)
         {
           std::cout << "====================================================================================================" << std::endl;
-          std::cout << "Reading data file " << _fileName << std::endl; 
+          std::cout << "Reading data file " << _fileName << std::endl;
         }
     }
 #endif
-  
+
   // Pour stocker chaque ligne
   std::string line;
   // Run through the dataFile to find the parameters
@@ -214,7 +214,7 @@ void DataFile::readDataFile()
   _Ly = _ymax - _ymin;
   _dx = _Lx / (_Nx + 1);
   _dy = _Ly / (_Ny + 1);
-  
+
   // Calcul du pas de temps pour Euler Explicite
   if (_timeScheme == "ExplicitEuler")
     {
@@ -222,7 +222,7 @@ void DataFile::readDataFile()
       if (MPI_Rank == 0)
         {
           std::cout << termcolor::yellow << "Adjusting the time step to fit the CFL condition" << std::endl;
-          std::cout << termcolor::reset; 
+          std::cout << termcolor::reset;
         }
 #endif
       _timeStep = _CFL * (pow(_dx,2) * pow(_dy,2)) / (2. * _diffCoeff * (pow(_dx,2) + pow(_dy,2)));
@@ -233,10 +233,10 @@ void DataFile::readDataFile()
   if (MPI_Rank == 0)
     {
       std::cout << termcolor::yellow << "Adjusting the time step to land exactly on the final time" << std::endl;
-      std::cout << termcolor::reset; 
+      std::cout << termcolor::reset;
     }
 #endif
-  
+
   int nbIterations(int(ceil((_finalTime - _initialTime)/_timeStep)));
   _timeStep = (_finalTime - _initialTime)/nbIterations;
 
@@ -244,11 +244,11 @@ void DataFile::readDataFile()
   if (MPI_Rank == 0)
     std::cout << "The new time step is dt = " << _timeStep << std::endl;
 #endif
-  
+
   // Création et nettoyage du dossier de résultats
   if (MPI_Rank == 0)
     {
-      
+
 #if VERBOSITY>0
       std::cout << "Creating the results directory..." << std::endl;
       std::cout << "Creating the error and cputime directory..." << std::endl;
@@ -301,7 +301,7 @@ void DataFile::printData() const
       std::cout << "Final time            = " << _finalTime << std::endl;
       if (_timeScheme == "ExplicitEuler")
         {
-          std::cout << "CFL number            = " << _CFL << std::endl; 
+          std::cout << "CFL number            = " << _CFL << std::endl;
         }
       std::cout << "Time step             = " << _timeStep << std::endl;
       if (_timeScheme == "ImplicitEuler")
@@ -311,13 +311,13 @@ void DataFile::printData() const
           std::cout << "    |Tolerance        = " << _tolerance << std::endl;
           std::cout << "    |Save residual ?  = " << _isSaveResidual << std::endl;
           if (_isSaveResidual)
-            std::cout << "    |Residual File    = " << _resFile << std::endl; 
+            std::cout << "    |Residual File    = " << _resFile << std::endl;
         }
       std::cout << "Results directory     = " << _resultsDir << std::endl;
       std::cout << "Save final time only? = " << _isSaveFinalResultOnly << std::endl;
       if (!_isSaveFinalResultOnly)
         std::cout << "Save Frequency        = " << _saveFrequency << std::endl;
-      std::cout << "====================================================================================================" << std::endl << std::endl; 
+      std::cout << "====================================================================================================" << std::endl << std::endl;
     }
 #endif
 }

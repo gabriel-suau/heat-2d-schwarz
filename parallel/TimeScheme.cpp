@@ -3,14 +3,14 @@
  *
  * @brief Defines classes for time integration.
  *
- * @authors Gabriel Suau, Remi Pegouret, Geoffrey Lebaud
+ * @authors Gabriel Suau, Lucas Trautmann, Geoffrey Lebaud
  *
  * @version 0.1.0
  *
  * @copyright © 2021 Gabriel Suau
- * @copyright © 2021 Remi Pegouret
+ * @copyright © 2021 Lucas Trautmann
  * @copyright © 2021 Geoffrey Lebaud
- * 
+ *
  * @copyright This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -113,7 +113,7 @@ void TimeScheme::solve()
   if (MPI_Rank == 0)
     {
       std::cout << "====================================================================================================" << std::endl;
-      std::cout << "Time loop..." << std::endl; 
+      std::cout << "Time loop..." << std::endl;
     }
 #endif
 
@@ -145,7 +145,7 @@ void TimeScheme::solve()
           saveCurrentSolution(solFileName);
         }
     }
-  
+
   // Calcul et sauvegarde du temps CPU
   auto finish = MPI_Wtime();
   double cpuTime = finish - start;
@@ -154,7 +154,7 @@ void TimeScheme::solve()
       std::string cputimeFileName(_DF->getErrorAndCPUTimeDir() + "/cputime.dat");
       std::ofstream cputimeFile(cputimeFileName, std::ios::app);
       cputimeFile.precision(10);
-      cputimeFile << MPI_Size << " " << _DF->getNx() << " " << _DF->getNy() << " " << _DF->getNx() * _DF->getNy() << " " << _DF->getDx() << " " << _DF->getDy() << " " <<_DF->getDx() * _DF->getDy() << " " << cpuTime << std::endl; 
+      cputimeFile << MPI_Size << " " << _DF->getNx() << " " << _DF->getNy() << " " << _DF->getNx() * _DF->getNy() << " " << _DF->getDx() << " " << _DF->getDy() << " " <<_DF->getDx() * _DF->getDy() << " " << cpuTime << std::endl;
     }
 
 
@@ -168,7 +168,7 @@ void TimeScheme::solve()
       std::string solFileName(_resultsDir + "/solution_scenario_" + std::to_string(scenario) + "_" + std::to_string(MPI_Rank) + "_" + std::to_string(n/_DF->getSaveFrequency()) + ".dat");
       saveCurrentSolution(solFileName);
     }
-  
+
   // Save the exact solution
   if (_DF->getScenario() == 1 || _DF->getScenario() == 2)
     {
@@ -180,7 +180,7 @@ void TimeScheme::solve()
       std::string exactSolFileName(_resultsDir + "/solution_exacte_scenario_" + std::to_string(scenario) + "_" + std::to_string(MPI_Rank) + ".dat");
       _function->saveCurrentExactSolution(exactSolFileName);
     }
-  
+
   // Calcul et sauvegarde de l'erreur pour les scenario 1 et 2
   if (_DF->getScenario() == 1 || _DF->getScenario() == 2)
     {
@@ -191,7 +191,7 @@ void TimeScheme::solve()
           std::string errorFileName(_DF->getErrorAndCPUTimeDir() + "/error.dat");
           std::ofstream errorFile(errorFileName, std::ios::app);
           errorFile.precision(10);
-          errorFile << _DF->getNx() << " " << _DF->getNy() << " " << _DF->getNx() * _DF->getNy() << " " << _DF->getDx() << " " << _DF->getDy() << " " <<_DF->getDx() * _DF->getDy() << " " << L2error << " " << L1error << std::endl; 
+          errorFile << _DF->getNx() << " " << _DF->getNy() << " " << _DF->getNx() * _DF->getNy() << " " << _DF->getDx() << " " << _DF->getDy() << " " <<_DF->getDx() * _DF->getDy() << " " << L2error << " " << L1error << std::endl;
         }
       if (MPI_Rank == 0)
         {
@@ -199,13 +199,13 @@ void TimeScheme::solve()
           std::cout << "Error L1 = " << L1error << " at t = " << _currentTime << " for Nx = " << _DF->getNx() << ", Ny = " << _DF->getNy() << std::endl << std::endl;
         }
     }
-  
+
   // Logs de fin
 #if VERBOSITY>0
   if (MPI_Rank == 0)
     {
       std::cout << termcolor::green << "SUCCESS::TIMESCHEME : Time loop completed successfully in " << cpuTime << " seconds !" << std::endl;
-      std::cout << termcolor::reset << "====================================================================================================" << std::endl << std::endl; 
+      std::cout << termcolor::reset << "====================================================================================================" << std::endl << std::endl;
     }
 #endif
 }

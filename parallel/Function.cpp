@@ -3,14 +3,14 @@
  *
  * @brief Defines classes for the source terms and the boundary conditions.
  *
- * @authors Gabriel Suau, Remi Pegouret, Geoffrey Lebaud
+ * @authors Gabriel Suau, Lucas Trautmann, Geoffrey Lebaud
  *
  * @version 0.1.0
  *
  * @copyright © 2021 Gabriel Suau
- * @copyright © 2021 Remi Pegouret
+ * @copyright © 2021 Lucas Trautmann
  * @copyright © 2021 Geoffrey Lebaud
- * 
+ *
  * @copyright This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -86,10 +86,10 @@ void Function::Initialize()
   if (MPI_Rank == 0)
     {
       std::cout << "====================================================================================================" << std::endl;
-      std::cout << "Building initial condition..." << std::endl; 
+      std::cout << "Building initial condition..." << std::endl;
     }
 #endif
-  
+
   // Resize la CI, le terme source et la solution exacte
   _Sol0.resize(localSize);
   _sourceTerm.resize(localSize);
