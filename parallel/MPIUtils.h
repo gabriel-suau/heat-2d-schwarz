@@ -60,12 +60,6 @@ inline void charge(int N, int Np, int me, int nOverlap, int* iBegin, int* iEnd)
   int chargeMinParProc(N/Np);
   // Reste à répartir
   int reste(N%Np);
-  // Gestion du recouvrement
-  // nOverlap pair -->
-  // nOverlap impair -->
-  int add_up, add_down;
-  add_up = nOverlap / 2;
-  add_down = add_up + nOverlap % 2;
 
   if (me < reste)
     {
@@ -79,10 +73,10 @@ inline void charge(int N, int Np, int me, int nOverlap, int* iBegin, int* iEnd)
     }
 
   if (me + 1 < MPI_Size) {
-    *iEnd += add_up;
+    *iEnd += nOverlap;
   }
   if (me > 0) {
-    *iBegin -= add_down;
+    *iBegin -= nOverlap;
   }
 
 }
