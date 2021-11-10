@@ -54,29 +54,23 @@ private:
   DataFile* _DF; ///< Pointer to a DataFile object.
   Function* _function; ///< Pointer to a Function object.
 
-  DVector AA, IA, JA; ///< CSR storage.
+  DVector _AA, _IA, _JA; ///< CSR storage.
   int _NNZ; ///< Number of non zero elements in the matrix.
-  int _Nx, _Ny; ///< Number of unknowns in the x and y directions.
+  int _N; ///< Size of the system.
 
 public:
-  /*! @brief Constructs an empty Laplacian object. */
-  Laplacian();
-
   /*! @brief Constructs a Laplacian object using a DataFile object and a Function object. */
   Laplacian(DataFile* DF, Function* function);
 
   /*! @brief Default destructor. */
   ~Laplacian() = default;
 
-  /*! @brief Initializes an already constructed Laplacian object. */
-  void Initialize();
-
-  /*! @brief Initializes an empty constructed Laplacian object. */
-  void Initialize(DataFile* DF, Function* function);
-
   // Getters
-  int getNx() const {return _Nx;}
-  int getNy() const {return _Ny;};
+  int getN() const {return _N;};
+
+  /*! @brief Build the Matrix */
+  void buildMat();
+  void updateMat();
 
   /*! @brief Performs a matrix vector product. */
   DVector matVecProd(const DVector& x);

@@ -36,41 +36,21 @@
 #include <mpi.h>
 
 
-Laplacian::Laplacian()
-{
-}
-
-
 Laplacian::Laplacian(DataFile* DF, Function* function):
-  _DF(DF), _function(function)
+  _DF(DF), _function(function), _N(localSize)
 {
 }
 
 
-/*!
- * @param [in] DF A pointer to a DataFile object.
- * @param [in] function A pointer to a Function object.
- *
- * @deprecated This method could be useful if we decided to construct an empty Laplacian object.
- * But we never use it in this code...
- */
-void Laplacian::Initialize(DataFile* DF, Function* function)
-{
-  _DF = DF;
-  _function = function;
-  this->Initialize();
+void Laplacian::buildMat() {
+  
 }
 
 
-void Laplacian::Initialize()
-{
-  // On récupère les paramètres necessaires pour construire la matrice
-  double dx(_DF->getDx()), dy(_DF->getDy());
-  double D(_DF->getDiffCoeff());
-  double dt(_DF->getTimeStep());
-  _Nx = _DF->getNx();
-  _Ny = _DF->getNy();
+void Laplacian::updateMat() {
+  
 }
+
 
 /*!
  * @details The discrete laplacian matrix is very sparse (block tridiagonal), so
@@ -84,51 +64,31 @@ DVector Laplacian::matVecProd(const DVector& x)
 {
   // Vecteur resultat
   DVector result;
-  DVector prev, next;
-  int size(x.size());
+  int size(_N);
+  int i, k, k1, k2;
   result.resize(size, 0.);
-  prev.resize(_Nx, 0.);
-  next.resize(_Nx, 0.);
 
-  // MPI Communications
-  // Each proc has to communicate with proc - 1 and proc + 1
-  if (MPI_Rank + 1 < MPI_Size)
-    {
-      MPI_Sendrecv(&x[size - _Nx], _Nx, MPI_DOUBLE, MPI_Rank + 1, 0,
-                   &next[0], _Nx, MPI_DOUBLE, MPI_Rank + 1, 1,
-                   MPI_COMM_WORLD, &status);
+  for (i = 0 ; i < _N ; i++) {
+    k1 = _IA[i];
+    k2 = _IA[i+1];
+    for (k = k1 ; k < k2 ; k++) {
+      result[i] += _AA[k] * x[_JA[k]];
     }
-  if (MPI_Rank - 1 >= 0)
-    {
-      MPI_Sendrecv(&x[0], _Nx, MPI_DOUBLE, MPI_Rank - 1, 1,
-                   &prev[0], _Nx, MPI_DOUBLE, MPI_Rank - 1, 0,
-                   MPI_COMM_WORLD, &status);
-    }
+  }
 
-  // // Boucle
-  // for (int k(0) ; k < size ; ++k)
+  // // MPI Communications
+  // // Each proc has to communicate with proc - 1 and proc + 1
+  // if (MPI_Rank + 1 < MPI_Size)
   //   {
-  //     // Indices
-  //     int i(k%_Nx), j(k/_Nx);
-
-  //     // Termes diagonaux
-  //     result[k] += _gamma * x[k];
-
-  //     // Termes non diagonaux
-  //     if (j == 0) // Interface entre les procs MPI_Rank et MPI_Rank - 1.
-  //       result[k] += _alpha * prev[i];
-  //     else
-  //       result[k] += _alpha * x[k-_Nx];
-
-  //     if (i != 0)
-  //       result[k] += _beta * x[k-1];
-  //     if (i != _Nx - 1)
-  //       result[k] += _beta * x[k+1];
-
-  //     if (j == nbDomainRows - 1) // Interface entre les procs MPI_Rank et MPI_Rank + 1.
-  //       result[k] += _alpha * next[i];
-  //     else
-  //       result[k] += _alpha * x[k+_Nx];
+  //     MPI_Sendrecv(&x[size - _Nx], _Nx, MPI_DOUBLE, MPI_Rank + 1, 0,
+  //                  &next[0], _Nx, MPI_DOUBLE, MPI_Rank + 1, 1,
+  //                  MPI_COMM_WORLD, &status);
+  //   }
+  // if (MPI_Rank - 1 >= 0)
+  //   {
+  //     MPI_Sendrecv(&x[0], _Nx, MPI_DOUBLE, MPI_Rank - 1, 1,
+  //                  &prev[0], _Nx, MPI_DOUBLE, MPI_Rank - 1, 0,
+  //                  MPI_COMM_WORLD, &status);
   //   }
 
   return result;
