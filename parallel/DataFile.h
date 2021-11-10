@@ -6,14 +6,14 @@
  * This file contains a DataFile class that reads the parameters file
  * and contains all the parameters of the simulation.
  *
- * @authors Gabriel Suau, Remi Pegouret, Geoffrey Lebaud
+ * @authors Gabriel Suau, Lucas Trautmann, Geoffrey Lebaud
  *
  * @version 0.1.0
  *
  * @copyright © 2021 Gabriel Suau
- * @copyright © 2021 Remi Pegouret
+ * @copyright © 2021 Lucas Trautmann
  * @copyright © 2021 Geoffrey Lebaud
- * 
+ *
  * @copyright This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -53,10 +53,10 @@ private:
   bool _isSaveFinalResultOnly; ///< Boolean to check wether only the final result must be saved.
   int _saveFrequency; ///< Number of iterations between each saving of the solution (ignored if _isSaveFinalResultOnly is set to true).
   std::string _errorAndCPUTimeDir; ///< Directory in which the CPU time and the error are written.
-  
+
   // Scenario
   int _scenario; ///< Scenario that is simulated (1, 2 or 3).
-  
+
   // Time parameters
   std::string _timeScheme; ///< Time integrator (ExplicitEuler or ImplicitEuler).
   double _initialTime; ///< Initial time.
@@ -65,6 +65,7 @@ private:
   double _CFL; ///< CFL number. It is used with the Explicit Euler scheme to ensure its stability.
 
   // Spatial parameters
+  int _saveFrequency, _nSubdomains, _nOverlap
   double _xmin, _xmax, _ymin, _ymax; ///< Boundaries of the domain.
   double _Lx, _Ly; ///< Lengths of the domain in the x and y directions.
   int _Nx, _Ny; ///< Number of nodes (or unknowns) in the x and y directions.
@@ -75,15 +76,15 @@ private:
   double _tolerance; ///< Tolerance for the Conjugate Gradient.
   bool _isSaveResidual; ///< Boolean to check wether the residuals are to be saved or not.
   std::string _resFile; ///< File in which the residuals are saved.
-  
+
   // Diffusion coefficient
   double _diffCoeff; ///< Diffusion coefficient
-  
+
 public:
 
   /*! @brief Empty constructor. */
   DataFile();
-  
+
   /*! @brief Construct a DataFile object using the data file name. */
   DataFile(const std::string& fileName);
 
@@ -112,6 +113,9 @@ public:
   double getFinalTime() const {return _finalTime;};
   double getTimeStep() const {return _timeStep;};
   double getCFL() const {return _CFL;};
+  int getSaveFrequency() const { return _saveFrequency; };
+  int getnSubsomains() const { return _nSubdomains; };
+  int getnOverlap() const { return _nOverlap; };
   // Mesh parameters
   double getxMin() const {return _xmin;};
   double getxMax() const {return _xmax;}
