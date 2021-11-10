@@ -128,6 +128,9 @@ void TimeScheme::solve()
   // Démarrage du chrono
   auto start = MPI_Wtime();
 
+  // Construction de la matrice
+  _laplacian->buildMat();
+
   // Boucle en temps
   while (_currentTime < _finalTime)
     {
@@ -266,12 +269,15 @@ void ExplicitEuler::oneStep()
 {
   // Récupération des trucs importants
   double dt(_timeStep);
+
   // Calcul du terme source
   _function->buildSourceTerm(_currentTime + dt);
-  const DVector& source(_function->getSourceTerm());
+
+  // Update la matrice du laplacien si besoin (conditions mixtes)
+  _laplacian->updateMat();
 
   // Calcul de la solution
-  _Sol = _Sol + _laplacian->matVecProd(_Sol) + dt * source;
+  _Sol = _Sol + _laplacian->matVecProd(_Sol) + dt * _function->getSourceTerm();
 }
 
 
@@ -312,8 +318,13 @@ void ImplicitEuler::oneStep()
   // Ouverture du fichier pour les résidus
   std::ofstream resFile(_resFileName, std::ios::app);
   resFile.precision(10);
+
   // Calcul du terme source
   _function->buildSourceTerm(_currentTime + dt);
+
+  // Update la matrice du laplacien si besoin (conditions mixtes)
+  _laplacian->updateMat();
+
   // Calcul de la solution
   _Sol = _laplacian->solveConjGrad(_Sol + dt * _function->getSourceTerm(), _Sol, tolerance, maxIt, resFile);
 }
