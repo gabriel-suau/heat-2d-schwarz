@@ -32,7 +32,7 @@ DiffusionCoefficient
 nSubdomains
 4
 # Nombre de lignes de recouvrement
-nOverlapLine
+nOverlap
 4
 # Dimensions du domaine rectangulaire
 xmin
