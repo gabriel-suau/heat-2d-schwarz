@@ -65,7 +65,11 @@ private:
   double _CFL; ///< CFL number. It is used with the Explicit Euler scheme to ensure its stability.
 
   // Spatial parameters
+<<<<<<< HEAD
   int _nSubdomains, _nOverlap ///< Number of subdomains, number of over lap lines
+=======
+  int _nSubdomains, _nOverlap;
+>>>>>>> 521f087 (Bug correction + remove some useless functions.)
   double _xmin, _xmax, _ymin, _ymax; ///< Boundaries of the domain.
   double _Lx, _Ly; ///< Lengths of the domain in the x and y directions.
   int _Nx, _Ny; ///< Number of nodes (or unknowns) in the x and y directions.
@@ -81,18 +85,11 @@ private:
   double _diffCoeff; ///< Diffusion coefficient
 
 public:
-
-  /*! @brief Empty constructor. */
-  DataFile();
-
   /*! @brief Construct a DataFile object using the data file name. */
   DataFile(const std::string& fileName);
 
   /*! @brief Default destructor. */
   ~DataFile() = default;
-
-  /*! @brief Initialize a DataFile object. */
-  void Initialize(const std::string& fileName);
 
   /*! @brief Reads the data file and sets the values of the parameters. */
   void readDataFile();
@@ -113,7 +110,6 @@ public:
   double getFinalTime() const {return _finalTime;};
   double getTimeStep() const {return _timeStep;};
   double getCFL() const {return _CFL;};
-  int getSaveFrequency() const { return _saveFrequency; };
   int getnSubsomains() const { return _nSubdomains; };
   int getnOverlap() const { return _nOverlap; };
   // Mesh parameters

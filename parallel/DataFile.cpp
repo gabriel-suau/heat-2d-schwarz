@@ -39,26 +39,9 @@
 #include <mpi.h>
 
 
-DataFile::DataFile()
-{
-}
-
-
 DataFile::DataFile(const std::string& fileName):
   _fileName(fileName)
 {
-}
-
-
-/*!
- * @param [in] fileName The name of the data file from which to initialize the DataFile object.
- *
- * @deprecated This method could be useful if we decided to construct an empty DataFile object.
- * But we never use it in this code...
- */
-void DataFile::Initialize(const std::string& fileName)
-{
-  _fileName = fileName;
 }
 
 
@@ -304,6 +287,8 @@ void DataFile::printData() const
       std::cout << "    |Ny               = " << _Ny << std::endl;
       std::cout << "    |dx               = " << _dx << std::endl;
       std::cout << "    |dy               = " << _dy << std::endl;
+      std::cout << "    |Nb domains       = " << _nSubdomains << std::endl;
+      std::cout << "    |Overlap size     = " << _nOverlap << std::endl;
       std::cout << "Time Scheme           = " << _timeScheme << std::endl;
       std::cout << "Initial time          = " << _initialTime << std::endl;
       std::cout << "Final time            = " << _finalTime << std::endl;
