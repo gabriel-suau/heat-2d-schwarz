@@ -3,14 +3,14 @@
  *
  * @brief Defines a Vector class.
  *
- * @authors Gabriel Suau, Remi Pegouret, Geoffrey Lebaud
+ * @authors Gabriel Suau, Lucas Trautmann, Geoffrey Lebaud
  *
  * @version 0.1.0
  *
  * @copyright © 2021 Gabriel Suau
- * @copyright © 2021 Remi Pegouret
+ * @copyright © 2021 Lucas Trautmann
  * @copyright © 2021 Geoffrey Lebaud
- * 
+ *
  * @copyright This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -38,7 +38,7 @@
  * @brief Represents a vector of doubles.
  *
  * @details This class is derived from the std::vector<double> class of the STL.
- * We added method and operators to perform basic operations such as : addition, 
+ * We added method and operators to perform basic operations such as : addition,
  * substraction, multiplication with a scalar, and dot product.
  */
 class DVector: public std::vector<double>
@@ -46,17 +46,17 @@ class DVector: public std::vector<double>
 public:
   /*! @brief Empty constructor. */
   DVector();
-  
+
   /*! @brief Constructs a vector full of zeros of size count. */
   DVector(size_type count);
 
   // Additional methods
   /*! @brief Adds the DVector vec to this DVector. */
   DVector add(const DVector& vec);
-  
+
   /*! @brief Subtracts the DVector vec to this DVector. */
   DVector sub(const DVector& vec);
-  
+
   /*! @brief Computes the dot product between the DVector vec and this DVector. */
   double dot(const DVector& vec);
 

@@ -3,14 +3,14 @@
  *
  * @brief Defines classes for time integration.
  *
- * @authors Gabriel Suau, Remi Pegouret, Geoffrey Lebaud
+ * @authors Gabriel Suau, Lucas Trautmann, Geoffrey Lebaud
  *
  * @version 0.1.0
  *
  * @copyright © 2021 Gabriel Suau
- * @copyright © 2021 Remi Pegouret
+ * @copyright © 2021 Lucas Trautmann
  * @copyright © 2021 Geoffrey Lebaud
- * 
+ *
  * @copyright This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -53,7 +53,7 @@ protected:
 
   // Solution
   DVector _Sol; ///< Solution vector. (updated at each time step)
-  
+
   // Paramètres de temps
   double _timeStep; ///< Time step of the simulation.
   double _initialTime; ///< Initial time.
@@ -63,11 +63,11 @@ protected:
   // Sauvegarde des résultats
   std::string _resultsDir; ///< Directory in which the results are saved.
   std::string _resFileName; ///< File in which the residuals of the Conjugate Gradient are saved.
-  
+
 public:
   /*! @brief Empty constructor. */
   TimeScheme();
-  
+
   /*! @brief Constructs a TimeScheme object using a DataFile, a Function and a Laplacian objects. */
   TimeScheme(DataFile* DF, Function* function, Laplacian* laplacian);
 
@@ -83,13 +83,13 @@ public:
   double getInitialTime() const {return _initialTime;};
   double getFinalTime() const {return _finalTime;};
   double getCurrentTime() const {return _currentTime;};
-  
+
   /*! @brief Performs one step of the selected time integration method and updates the solution (pure virtual). */
   virtual void oneStep() = 0;
-  
+
   /*! @brief Saves the current solution in a file. */
   void saveCurrentSolution(std::string& fileName) const;
-  
+
   /*! @brief Solves the problem. */
   void solve();
 

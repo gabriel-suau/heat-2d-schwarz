@@ -3,14 +3,14 @@
  *
  * @brief Defines the global MPI variables and a function to compute the load allocated to each MPI proc.
  *
- * @authors Gabriel Suau, Remi Pegouret, Geoffrey Lebaud
+ * @authors Gabriel Suau, Lucas Trautmann, Geoffrey Lebaud
  *
  * @version 0.1.0
  *
  * @copyright © 2021 Gabriel Suau
- * @copyright © 2021 Remi Pegouret
+ * @copyright © 2021 Lucas Trautmann
  * @copyright © 2021 Geoffrey Lebaud
- * 
+ *
  * @copyright This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
