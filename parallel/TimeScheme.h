@@ -64,14 +64,8 @@ protected:
   std::string _resultsDir; ///< Directory in which the results are saved.
 
 public:
-  /*! @brief Empty constructor. */
-  TimeScheme();
-
   /*! @brief Constructs a TimeScheme object using a DataFile, a Function and a Laplacian objects. */
   TimeScheme(DataFile* DF, Function* function, Laplacian* laplacian);
-
-  /*! @brief Initializes a TimeScheme object using a DataFile, a Function and a Laplacian objects. */
-  void Initialize(DataFile* DF, Function* function, Laplacian* laplacian);
 
   /*! @brief Default destructor. */
   virtual ~TimeScheme() = default;
