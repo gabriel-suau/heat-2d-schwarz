@@ -42,10 +42,6 @@
 //--------------------------------------------------//
 //--------------------Base Class--------------------//
 //--------------------------------------------------//
-TimeScheme::TimeScheme()
-{
-}
-
 
 /*!
  * @param DF DataFile object.
@@ -53,31 +49,8 @@ TimeScheme::TimeScheme()
  * @param laplacian Laplacian object.
  */
 TimeScheme::TimeScheme(DataFile* DF, Function* function, Laplacian* laplacian):
-  _DF(DF), _function(function), _laplacian(laplacian), _Sol(_function->getInitialCondition()), _timeStep(DF->getTimeStep()), _initialTime(DF->getInitialTime()), _finalTime(DF->getFinalTime()), _currentTime(_initialTime), _resultsDir(DF->getResultsDirectory()), _resFileName(_resultsDir + "/" + DF->getResFile())
+  _DF(DF), _function(function), _laplacian(laplacian), _Sol(_function->getInitialCondition()), _timeStep(DF->getTimeStep()), _initialTime(DF->getInitialTime()), _finalTime(DF->getFinalTime()), _currentTime(_initialTime), _resultsDir(DF->getResultsDirectory())
 {
-}
-
-
-/*!
- * @param DF DataFile object.
- * @param function Function object.
- * @param laplacian Laplacian object.
- *
- * @deprecated This method could be useful if we decided to construct an empty TimeScheme object.
- * But we never use it in this code...
- */
-void TimeScheme::Initialize(DataFile* DF, Function* function, Laplacian* laplacian)
-{
-  _DF = DF;
-  _function = function;
-  _laplacian = laplacian;
-  _Sol = _function->getInitialCondition();
-  _timeStep = DF->getTimeStep();
-  _initialTime = DF->getInitialTime();
-  _finalTime = DF->getFinalTime();
-  _currentTime = _initialTime;
-  _resultsDir = DF->getResultsDirectory();
-  _resFileName = DF->getResFile();
 }
 
 
@@ -240,28 +213,10 @@ double TimeScheme::computeCurrentL1Error()
 //-------------------------------------------------------------//
 //--------------------Explicit Euler scheme--------------------//
 //-------------------------------------------------------------//
-ExplicitEuler::ExplicitEuler():
-  TimeScheme()
-{
-}
-
 
 ExplicitEuler::ExplicitEuler(DataFile* DF, Function* function, Laplacian* laplacian):
   TimeScheme(DF, function, laplacian)
 {
-}
-
-
-void ExplicitEuler::Initialize(DataFile* DF, Function* function, Laplacian* laplacian)
-{
-  _DF = DF;
-  _function = function;
-  _laplacian = laplacian;
-  _Sol = _function->getInitialCondition();
-  _timeStep = DF->getTimeStep();
-  _initialTime = DF->getInitialTime();
-  _finalTime = DF->getFinalTime();
-  _currentTime = _initialTime;
 }
 
 
@@ -284,28 +239,10 @@ void ExplicitEuler::oneStep()
 //-------------------------------------------------------------//
 //--------------------Implicit Euler scheme--------------------//
 //-------------------------------------------------------------//
-ImplicitEuler::ImplicitEuler():
-  TimeScheme()
-{
-}
-
 
 ImplicitEuler::ImplicitEuler(DataFile* DF, Function* function, Laplacian* laplacian):
   TimeScheme(DF, function, laplacian)
 {
-}
-
-
-void ImplicitEuler::Initialize(DataFile* DF, Function* function, Laplacian* laplacian)
-{
-  _DF = DF;
-  _function = function;
-  _laplacian = laplacian;
-  _Sol = _function->getInitialCondition();
-  _timeStep = DF->getTimeStep();
-  _initialTime = DF->getInitialTime();
-  _finalTime = DF->getFinalTime();
-  _currentTime = _initialTime;
 }
 
 
@@ -315,9 +252,6 @@ void ImplicitEuler::oneStep()
   double dt(_timeStep);
   double tolerance(_DF->getTolerance());
   int maxIt(_DF->getMaxIterations());
-  // Ouverture du fichier pour les résidus
-  std::ofstream resFile(_resFileName, std::ios::app);
-  resFile.precision(10);
 
   // Calcul du terme source
   _function->buildSourceTerm(_currentTime + dt);
@@ -326,5 +260,5 @@ void ImplicitEuler::oneStep()
   _laplacian->updateMat();
 
   // Calcul de la solution
-  _Sol = _laplacian->solveConjGrad(_Sol + dt * _function->getSourceTerm(), _Sol, tolerance, maxIt, resFile);
+  _laplacian->solveConjGrad(_Sol + dt * _function->getSourceTerm(), _Sol, tolerance, maxIt);
 }

@@ -100,50 +100,33 @@ DVector Laplacian::matVecProd(const DVector& x)
  * @param x0 Initial guess for the iterative solver.
  * @param tolerance Tolerance for the residuals of the conjugate gradient method.
  * @param maxIterations Maximum number of iterations. When we reach this number of iterations, the linear solver stops and returns the current result, even if the result has not converged enough.
- * @param resFile Name of the file in which to save the residuals L2 norm.
  *
- * @return The solution of the linear system (a DVector object).
+ * @return void
  */
-DVector Laplacian::solveConjGrad(const DVector& b, const DVector& x0, double tolerance, int maxIterations, std::ofstream& resFile)
+void Laplacian::solveConjGrad(const DVector& b, DVector& x, double tolerance, int maxIterations)
 {
   // Variables intermédiaires
-  DVector x(x0);
-  DVector res(b - this->matVecProd(x0));
+  DVector res(b - this->matVecProd(x));
   DVector p(res);
   // Compute the initial global residual
   double resDotRes(res.dot(res));
   MPI_Allreduce(MPI_IN_PLACE, &resDotRes, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
   double beta(sqrt(resDotRes));
-  if (MPI_Rank == 0)
-    resFile << beta << std::endl;
 
   // Iterations of the method
   int k(0);
   while ((beta > tolerance) && (k < maxIterations))
     {
-      // Matvec product
       DVector z(this->matVecProd(p));
-      // Dot products
       double resDotP(res.dot(p)), zDotP(z.dot(p));
-      MPI_Allreduce(MPI_IN_PLACE, &resDotP, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-      MPI_Allreduce(MPI_IN_PLACE, &zDotP, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-      // Compute alpha
       double alpha(resDotP/zDotP);
-      // Update the solution
       x = x + alpha * p;
-      // Update the residual
       res = res - alpha * z;
-      // Dot product
       double resDotRes(res.dot(res));
-      MPI_Allreduce(MPI_IN_PLACE, &resDotRes, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-      // Compute gamma
       double gamma(resDotRes/pow(beta,2));
-      // Update p
       p = res + gamma * p;
       beta = sqrt(resDotRes);
       ++k;
-      if (MPI_Rank == 0)
-        resFile << beta << std::endl;
     }
 
   // Logs
@@ -163,5 +146,4 @@ DVector Laplacian::solveConjGrad(const DVector& b, const DVector& x0, double tol
     }
 #endif
 
-  return x;
 }

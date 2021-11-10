@@ -86,14 +86,6 @@ MaxIterations
 Tolerance
 1e-7
 
-# Sauvegarde de la norme des résidus dans un fichier
-IsSaveResidual
-1
-
-# File in which the residual norm is to be written
-ResidualFile
-norme_residus.dat
-
 
 ###############################################################
 ###             Sauvegarde/Stockage des résultats           ###

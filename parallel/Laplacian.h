@@ -76,7 +76,7 @@ public:
   DVector matVecProd(const DVector& x);
 
   /*! @brief Solves the linear system Ax = b using the conjugate gradient method. */
-  DVector solveConjGrad(const DVector& b, const DVector& x0, double tolerance, int maxIterations, std::ofstream& resFile);
+  void solveConjGrad(const DVector& b, DVector& x, double tolerance, int maxIterations);
 };
 
 #endif // LAPLACIAN_H

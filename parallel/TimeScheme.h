@@ -62,7 +62,6 @@ protected:
 
   // Sauvegarde des résultats
   std::string _resultsDir; ///< Directory in which the results are saved.
-  std::string _resFileName; ///< File in which the residuals of the Conjugate Gradient are saved.
 
 public:
   /*! @brief Empty constructor. */
@@ -107,14 +106,7 @@ public:
 class ExplicitEuler: public TimeScheme
 {
 public:
-  // Constructeurs
-  ExplicitEuler();
   ExplicitEuler(DataFile* DF, Function* function, Laplacian* laplacian);
-
-  // Initialiseur
-  void Initialize(DataFile* DF, Function* function, Laplacian* laplacian);
-
-  // One time step
   void oneStep();
 };
 
@@ -126,14 +118,7 @@ public:
 class ImplicitEuler: public TimeScheme
 {
 public:
-  // Constructeurs
-  ImplicitEuler();
   ImplicitEuler(DataFile* DF, Function* function, Laplacian* laplacian);
-
-  // Initialiseur
-  void Initialize(DataFile* DF, Function* function, Laplacian* laplacian);
-
-  // One time step
   void oneStep();
 };
 

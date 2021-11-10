@@ -78,8 +78,6 @@ private:
   // Linear solver parameters
   int _maxIterations; ///< Maximum number of iterations for the Conjugate Gradient.
   double _tolerance; ///< Tolerance for the Conjugate Gradient.
-  bool _isSaveResidual; ///< Boolean to check wether the residuals are to be saved or not.
-  std::string _resFile; ///< File in which the residuals are saved.
 
   // Diffusion coefficient
   double _diffCoeff; ///< Diffusion coefficient
@@ -95,15 +93,19 @@ public:
   void readDataFile();
 
   // Getters
+
   // DataFile name
   const std::string& getFileName() const {return _fileName;};
+
   // Solution saving
   const std::string& getResultsDirectory() const {return _resultsDir;};
   bool isSaveFinalResultOnly() const {return _isSaveFinalResultOnly;};
   int getSaveFrequency() const {return _saveFrequency;};
   const std::string& getErrorAndCPUTimeDir() const {return _errorAndCPUTimeDir;};
+
   // Scenario
   int getScenario() const {return _scenario;};
+
   // Time parameters
   const std::string& getTimeScheme() const {return _timeScheme;};
   double getInitialTime() const {return _initialTime;};
@@ -112,6 +114,7 @@ public:
   double getCFL() const {return _CFL;};
   int getnSubsomains() const { return _nSubdomains; };
   int getnOverlap() const { return _nOverlap; };
+
   // Mesh parameters
   double getxMin() const {return _xmin;};
   double getxMax() const {return _xmax;}
@@ -123,11 +126,11 @@ public:
   int getNy() const {return _Ny;};
   double getDx() const {return _dx;}
   double getDy() const {return _dy;};
+
   // Linear solver parameters
   int getMaxIterations() const {return _maxIterations;};
   double getTolerance() const {return _tolerance;};
-  bool isSaveResidual() const {return _isSaveResidual;}
-  std::string getResFile() const {return _resFile;};
+
   // Diffusion coefficient
   double getDiffCoeff() const {return _diffCoeff;};
 
