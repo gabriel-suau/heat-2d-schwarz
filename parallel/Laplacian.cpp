@@ -97,35 +97,39 @@ DVector Laplacian::matVecProd(const DVector& x)
 
 /*!
  * @param b Right hand side vector.
- * @param x0 Initial guess for the iterative solver.
- * @param tolerance Tolerance for the residuals of the conjugate gradient method.
+ * @param x Initial guess for the iterative solver (and solution at the end of the routine).
+ * @param tolerance Tolerance for the residuals of the method.
  * @param maxIterations Maximum number of iterations. When we reach this number of iterations, the linear solver stops and returns the current result, even if the result has not converged enough.
  *
  * @return void
  */
-void Laplacian::solveConjGrad(const DVector& b, DVector& x, double tolerance, int maxIterations)
+void Laplacian::CG(const DVector& b, DVector& x, double tolerance, int maxIterations)
 {
-  // Variables intermédiaires
-  DVector res(b - this->matVecProd(x));
-  DVector p(res);
-  // Compute the initial global residual
-  double resDotRes(res.dot(res));
-  MPI_Allreduce(MPI_IN_PLACE, &resDotRes, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-  double beta(sqrt(resDotRes));
+  // Variables
+  DVector r, p, z;
+  double rDotR, rDotP, zDotP, alpha, beta, gamma;
+  int k;
+  // Compute the initial ridual
+  r = b - this->matVecProd(x);
+  rDotR = r.dot(r);
+  beta = sqrt(rDotR);
+
+  p = r;
 
   // Iterations of the method
-  int k(0);
+  k = 0;
   while ((beta > tolerance) && (k < maxIterations))
     {
-      DVector z(this->matVecProd(p));
-      double resDotP(res.dot(p)), zDotP(z.dot(p));
-      double alpha(resDotP/zDotP);
+      z = this->matVecProd(p);
+      rDotP = r.dot(p);
+      zDotP = z.dot(p);
+      alpha = rDotP/zDotP;
       x = x + alpha * p;
-      res = res - alpha * z;
-      double resDotRes(res.dot(res));
-      double gamma(resDotRes/pow(beta,2));
-      p = res + gamma * p;
-      beta = sqrt(resDotRes);
+      r = r - alpha * z;
+      rDotR = r.dot(r);
+      gamma = rDotR/pow(beta,2);
+      p = r + gamma * p;
+      beta = sqrt(rDotR);
       ++k;
     }
 
@@ -141,6 +145,62 @@ void Laplacian::solveConjGrad(const DVector& b, DVector& x, double tolerance, in
       else
         {
           std::cout << termcolor::green << "SOLVER::GC::SUCCESS : The GC method converged in " << k << " iterations ! Residual L2 norm = " << beta << std::endl;
+          std::cout << termcolor::reset;
+        }
+    }
+#endif
+
+}
+
+/*!
+ * @param b Right hand side vector.
+ * @param x Initial guess for the iterative solver (and solution at the end of the routine).
+ * @param tolerance Tolerance for the residuals of the method.
+ * @param maxIterations Maximum number of iterations. When we reach this number of iterations, the linear solver stops and returns the current result, even if the result has not converged enough.
+ *
+ * @return void
+ */
+void Laplacian::BICGSTAB(const DVector& b, DVector& x, double tolerance, int maxIterations)
+{
+  // Variables
+  DVector r, rs, p, s, Ap, As;
+  double rDotR, alpha, beta, gamma, omega;
+  int k;
+  // Compute the initial residual
+  r = b - this->matVecProd(x);
+  rDotR = r.dot(r);
+  beta = sqrt(rDotR);
+  p = r;
+  rs = r;
+
+  // Iterations of the method
+  k = 0;
+  while ((beta > tolerance) && (k < maxIterations))
+    {
+      Ap = this->matVecProd(p);
+      gamma = 1.0 / r.dot(rs);
+      alpha = r.dot(rs) / Ap.dot(rs);
+      s = r - alpha * Ap;
+      As = this->matVecProd(s);
+      omega = As.dot(s) / As.dot(As);
+      x = x + alpha * p + omega * s;
+      r = s - omega * As;
+      gamma *= r.dot(rs) * alpha / omega;
+      ++k;
+    }
+
+  // Logs
+#if VERBOSITY>1
+  if (MPI_Rank == 0)
+    {
+      if ((k == maxIterations) && (beta > tolerance))
+        {
+          std::cout << termcolor::yellow << "SOLVER::BICGSTAB::WARNING : The BICGSTAB method did not converge. Residual L2 norm = " << beta << " (" << maxIterations << " iterations)" << std::endl;
+          std::cout << termcolor::reset;
+        }
+      else
+        {
+          std::cout << termcolor::green << "SOLVER::BICGSTAB::SUCCESS : The BICGSTAB method converged in " << k << " iterations ! Residual L2 norm = " << beta << std::endl;
           std::cout << termcolor::reset;
         }
     }

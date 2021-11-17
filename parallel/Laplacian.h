@@ -72,11 +72,13 @@ public:
   void buildMat();
   void updateMat();
 
-  /*! @brief Performs a matrix vector product. */
+  /*! @brief Performs a matrix vector product */
   DVector matVecProd(const DVector& x);
 
-  /*! @brief Solves the linear system Ax = b using the conjugate gradient method. */
-  void solveConjGrad(const DVector& b, DVector& x, double tolerance, int maxIterations);
+  /*! @brief Solves the linear system Ax = b using the conjugate gradient method */
+  void CG(const DVector& b, DVector& x, double tolerance, int maxIterations);
+  /*! @brief Solves the linear system Ax = b using the stabilized bi-conjugate gradient method */
+  void BICGSTAB(const DVector& b, DVector& x, double tolerance, int maxIterations);
 };
 
 #endif // LAPLACIAN_H
