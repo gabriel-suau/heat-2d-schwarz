@@ -28,12 +28,10 @@ DiffusionCoefficient
 ###             Paramètres spatiaux           ###
 #################################################
 
-# Nombre de sous-domaines
-nSubdomains
-4
 # Nombre de lignes de recouvrement de chaque côté d'un domaine
 nOverlap
-4
+2
+
 # Dimensions du domaine rectangulaire
 xmin
 0.
