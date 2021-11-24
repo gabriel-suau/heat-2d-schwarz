@@ -107,7 +107,7 @@ int main(int argc, char** argv)
   kEnd = DF->getNx() * (rowEnd + 1) - 1;
   localSize = DF->getNx() * nbDomainRows;
 
-  std::cout << MPI_Rank << " " << rowBegin << " " << rowEnd <<  " " << localSize << std::endl;
+  // std::cout << MPI_Rank << " " << rowBegin << " " << rowEnd <<  " " << localSize << std::endl;
 
 
   //-------------------------------------------------------------//

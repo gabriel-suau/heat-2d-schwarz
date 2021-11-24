@@ -230,10 +230,10 @@ ExplicitEuler::ExplicitEuler(DataFile* DF, Function* function, Laplacian* laplac
 void ExplicitEuler::oneStep()
 {
   // Calcul du terme source
-  _function->buildSourceTerm(_t + _dt);
+  _function->buildSourceTerm(_t);
 
   // Update la matrice du laplacien si besoin (conditions mixtes)
-  _laplacian->updateMat();
+  // _laplacian->updateMat();
 
   // Calcul de la solution
   _Sol = _Sol + _laplacian->matVecProd(_Sol) + _dt * _function->getSourceTerm();
@@ -252,17 +252,13 @@ ImplicitEuler::ImplicitEuler(DataFile* DF, Function* function, Laplacian* laplac
 
 void ImplicitEuler::oneStep()
 {
-  // Récupération des trucs importants
-  double tolerance(_DF->getTolerance());
-  int maxIt(_DF->getMaxIterations());
-
   // Calcul du terme source
   _function->buildSourceTerm(_t + _dt);
 
   // Update la matrice du laplacien si besoin (conditions mixtes)
-  _laplacian->updateMat();
+  // _laplacian->updateMat();
 
   // Calcul de la solution
-  // _laplacian->CG(_Sol + _dt * _function->getSourceTerm(), _Sol, tolerance, maxIt);
-  _laplacian->BICGSTAB(_Sol + _dt * _function->getSourceTerm(), _Sol, tolerance, maxIt);
+  // _laplacian->CG(_Sol + _dt * _function->getSourceTerm(), _Sol, _DF->getTolerance(), _DF->getMaxIterations());
+  _laplacian->BICGSTAB(_Sol + _dt * _function->getSourceTerm(), _Sol, _DF->getTolerance(), _DF->getMaxIterations());
 }

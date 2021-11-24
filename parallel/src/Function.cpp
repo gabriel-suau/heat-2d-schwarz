@@ -66,7 +66,7 @@ void Function::Initialize()
   _sourceTerm.resize(_N);
   _exactSol.resize(_N);
   for (i = 0 ; i < _N ; ++i) {
-    _Sol0[i] = 1.;
+    _Sol0[i] = 1.0;
   }
 
   // Logs de fin
@@ -86,34 +86,37 @@ void Function::Initialize()
  */
 void Function::buildSourceTerm(double t)
 {
-  int i, j, k;
-  double x, y, D;
+  int i, j, k, kloc;
+  double x, y, D, one_over_dx2, one_over_dy2;
 
   D = _DF->getDiffCoeff();
+  one_over_dx2 = 1.0 / (_dx * _dx);
+  one_over_dy2 = 1.0 / (_dy * _dy);
 
-  for (k = kBegin ; k <= kEnd ; ++k) {
+  for (k = kBegin ; k <= kEnd ; k++) {
     // Intérieur du domaine
     i = k % _Nx;
     j = k / _Nx;
     x = _xmin + (i+1) * _dx;
     y = _ymin + (j+1) * _dy;
-    _sourceTerm[k - kBegin] = f(x, y, t);
+    kloc = k - kBegin;
+    _sourceTerm[kloc] = f(x, y, t);
     // Conditions aux limites
     // Bord bas
     if (j == 0) {
-      _sourceTerm[k - kBegin] += D * g(x, _ymin, t) / pow(_dy, 2);
+      _sourceTerm[kloc] += D * g(x, _ymin, t) * one_over_dy2;
     }
     // Bord haut
     else if (j == _Ny - 1) {
-      _sourceTerm[k - kBegin] += D * g(x, _ymax, t) / pow(_dy, 2);
+      _sourceTerm[kloc] += D * g(x, _ymax, t) * one_over_dy2;
     }
     // Bord gauche
-    if (i == 0 && j != 0) {
-      _sourceTerm[k - kBegin] += D * h(_xmin, y, t) / pow(_dx, 2);
+    if (i == 0) {
+      _sourceTerm[kloc] += D * h(_xmin, y, t) * one_over_dx2;
     }
     // Bord droit
-    else if (i == _Nx - 1 && j != _Ny - 1) {
-      _sourceTerm[k - kBegin] += D * h(_xmax, y, t) / pow(_dx, 2);
+    else if (i == _Nx - 1) {
+      _sourceTerm[kloc] += D * h(_xmax, y, t) * one_over_dx2;
     }
   }
 
@@ -172,7 +175,7 @@ Function1::Function1(DataFile* DF):
 
 double Function1::f(const double x, const double y, const double t)
 {
-  return 2*(y-y*y+x-x*x);
+  return 2 * (y - y * y + x - x * x);
 }
 
 
@@ -192,7 +195,7 @@ void Function1::buildExactSolution(double t)
 {
   int i, j, k;
   double x, y;
-  
+
   for (k = kBegin ; k <= kEnd ; ++k) {
     j = k / _Nx;
     i = k % _Nx;

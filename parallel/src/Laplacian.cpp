@@ -60,16 +60,21 @@ void Laplacian::setFromTriplets(const std::vector<triplet_t>& triplets)
     _IA[triplet.i + 1]++;
   }
 
+  for (i = 0 ; i < _N ; i++) {
+    _IA[i+1] += _IA[i];
+  }
+
 }
 
 
 void Laplacian::buildMat() {
-  int i, k, Nx;
+  int i, Nx, Ny, count;
   double dx, dy, dt, one_over_dx2, one_over_dy2;
   double alpha, beta, gamma, D;
   std::vector<triplet_t> triplets;
 
   Nx = _DF->getNx();
+  Ny = _DF->getNy();
   dx = _DF->getDx();
   dy = _DF->getDy();
   dt = _DF->getTimeStep();
@@ -81,7 +86,7 @@ void Laplacian::buildMat() {
   if (_DF->getTimeScheme() == "ExplicitEuler") {
     alpha = - 2.0 * D * dt * (one_over_dx2 + one_over_dy2);
     beta = dt * D * one_over_dx2;
-    gamma = dt * D * one_over_dy2;    
+    gamma = dt * D * one_over_dy2;
   }
   else if (_DF->getTimeScheme() == "ImplicitEuler") {
     alpha = 1.0 + 2.0 * D * dt * (one_over_dx2 + one_over_dy2);
@@ -89,41 +94,23 @@ void Laplacian::buildMat() {
     gamma = - dt * D * one_over_dy2;
   }
 
-  // _NNZ = _N + (_N - Nx) + (_N - _Nx) + (_N - 1) + (_N - 1);
-  _NNZ = 5 * _N - 2 * Nx - 2;
+  // _NNZ = _N + (_N - Nx) + (_N - _Nx) + (_N - Ny) + (_N - Ny);
+  _NNZ = 5 * _N - 2 * Nx - 2 * Ny;
+  count = 0;
   triplets.resize(_NNZ);
 
-  /* Diagonal coefficients */
   for (i = 0 ; i < _N ; i++) {
-    k = i;
-    triplets[i] = {k, k, alpha};
-  }
-  /* 1st over-diagonal */
-  for (i = _N ; i < 2 * _N - 1 ; i++) {
-    k = i - _N;
-    triplets[i] = {k, k+1, beta};
-  }
-  /* 1st sub-diagonal */
-  for (i = 2 * _N - 1 ; i < 3 * _N - 2 ; i++) {
-    k = i - (2 * _N - 1);
-    triplets[i] = {k+1, k, beta};
-  }
-  /* 2nd over-diagonal */
-  for (i = 3 * _N - 2 ; i < 4 * _N - 2 - Nx ; i++) {
-    k = i - (3 * _N - 2);;
-    triplets[i] = {k, k+Nx, gamma};
-  }
-  /* 2nd sub-diagonal */
-  for (i = 4 * _N - 2 - Nx ; i < 5 * _N - 2 - 2 * Nx ; i++) {
-    k = i - (4 * _N - 2 - Nx);
-    triplets[i] = {k+Nx, k, gamma};
+    if (i >= Nx) triplets[count++] = {i, i-Nx, gamma};
+    if (i % Nx != 0)  triplets[count++] = {i, i-1, beta};
+    triplets[count++] = {i, i, alpha};
+    if (i % Nx != Nx - 1) triplets[count++] = {i, i+1, beta};
+    if (i < _N - Nx) triplets[count++] = {i, i+Nx, gamma};
   }
 
-  for (i = 0 ; i < _NNZ ; i++) {
-    std::cout << triplets[i].i << " " << triplets[i].j << " " << triplets[i].coef << std::endl;
-  }
+  assert (count == _NNZ);
 
   this->setFromTriplets(triplets);
+
 }
 
 
@@ -144,9 +131,8 @@ DVector Laplacian::matVecProd(const DVector& x)
 {
   // Vecteur resultat
   DVector result;
-  int size(_N);
   int i, k, k1, k2;
-  result.resize(size, 0.);
+  result.resize(_N, 0.);
 
   for (i = 0 ; i < _N ; i++) {
     k1 = _IA[i];
@@ -252,14 +238,15 @@ void Laplacian::BICGSTAB(const DVector& b, DVector& x, double tolerance, int max
   k = 0;
   while ((beta > tolerance) && (k < maxIterations)) {
     Ap = this->matVecProd(p);
-    gamma = 1.0 / r.dot(rs);
-    alpha = r.dot(rs) / Ap.dot(rs);
+    gamma = r.dot(rs);
+    alpha = gamma / Ap.dot(rs);
     s = r - alpha * Ap;
     As = this->matVecProd(s);
     omega = As.dot(s) / As.dot(As);
     x = x + alpha * p + omega * s;
     r = s - omega * As;
-    gamma *= r.dot(rs) * alpha / omega;
+    beta = r.dot(rs) * alpha / (omega * gamma);
+    p = r + beta * (p - omega * Ap);
     ++k;
   }
 
