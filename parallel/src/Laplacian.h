@@ -35,6 +35,11 @@
 #include "Vector.h"
 #include <fstream>
 
+typedef struct {
+  int i, j;
+  double coef;
+} triplet_t;
+
 /*!
  * @class Laplacian
  *
@@ -54,9 +59,12 @@ private:
   DataFile* _DF; ///< Pointer to a DataFile object.
   Function* _function; ///< Pointer to a Function object.
 
-  DVector _AA, _IA, _JA; ///< CSR storage.
+  std::vector<int> _IA, _JA;
+  DVector _AA; ///< CSR storage.
   int _NNZ; ///< Number of non zero elements in the matrix.
   int _N; ///< Size of the system.
+
+  void setFromTriplets(const std::vector<triplet_t>& triplets);
 
 public:
   /*! @brief Constructs a Laplacian object using a DataFile object and a Function object. */
@@ -79,6 +87,7 @@ public:
   void CG(const DVector& b, DVector& x, double tolerance, int maxIterations);
   /*! @brief Solves the linear system Ax = b using the stabilized bi-conjugate gradient method */
   void BICGSTAB(const DVector& b, DVector& x, double tolerance, int maxIterations);
+
 };
 
 #endif // LAPLACIAN_H

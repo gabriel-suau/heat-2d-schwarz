@@ -59,6 +59,7 @@ protected:
   double _dy; ///< Space stepp in the y direction
   int _Nx; ///< Number of nodes in the x direction
   int _Ny; ///< Number of unknown in the y direction
+  int _N;
 
   // Vecteur solution initiale
   DVector _Sol0; ///< Initial condition.

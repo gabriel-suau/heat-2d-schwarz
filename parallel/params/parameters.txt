@@ -12,7 +12,7 @@
 #       2 --> f = g = h = sin(x) + cos(y)
 #       3 --> f = exp(-(x-Lx/2)^2)*exp(-(y-Ly/2)^2)*cos(pi/2*t), g = 0, h = 1
 Scenario
-3
+1
 
 
 ##################################################
@@ -45,9 +45,9 @@ ymax
 # Nombre de noeuds de discrétisation pour chaque direction
 # On ne compte pas les noeuds de bords, donc Nx * Ny est le nb d'inconnues.
 Nx
-160
+10
 Ny
-160
+10
 
 
 ##################################################
@@ -100,7 +100,7 @@ SaveFinalResultOnly
 # Fréquence de sauvegarde de la solution numérique (en nb d'itérations)
 # Ignoré si SaveFinalResultOnly vaut 1
 SaveFrequency
-4
+40
 
 # Repertoire ou socker le temps CPU et l'erreur
 # Utile pour les tests de convergence et de scalabilité

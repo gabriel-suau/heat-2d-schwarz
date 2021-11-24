@@ -34,7 +34,7 @@
 
 #include <cmath>
 #include <mpi.h>
-
+#include <cassert>
 
 Laplacian::Laplacian(DataFile* DF, Function* function):
   _DF(DF), _function(function), _N(localSize)
@@ -42,8 +42,88 @@ Laplacian::Laplacian(DataFile* DF, Function* function):
 }
 
 
+void Laplacian::setFromTriplets(const std::vector<triplet_t>& triplets)
+{
+  triplet_t triplet;
+  int i;
+
+  assert (triplets.size() == _NNZ);
+
+  _AA.resize(_NNZ);
+  _JA.resize(_NNZ);
+  _IA.resize(_N + 1, 0);
+
+  for (i = 0 ; i < _NNZ ; i++) {
+    triplet = triplets[i];
+    _AA[i] = triplet.coef;
+    _JA[i] = triplet.j;
+    _IA[triplet.i + 1]++;
+  }
+
+}
+
+
 void Laplacian::buildMat() {
-  
+  int i, k, Nx;
+  double dx, dy, dt, one_over_dx2, one_over_dy2;
+  double alpha, beta, gamma, D;
+  std::vector<triplet_t> triplets;
+
+  Nx = _DF->getNx();
+  dx = _DF->getDx();
+  dy = _DF->getDy();
+  dt = _DF->getTimeStep();
+  D = _DF->getDiffCoeff();
+
+  one_over_dx2 = 1.0 / (dx * dx);
+  one_over_dy2 = 1.0 / (dy * dy);
+
+  if (_DF->getTimeScheme() == "ExplicitEuler") {
+    alpha = - 2.0 * D * dt * (one_over_dx2 + one_over_dy2);
+    beta = dt * D * one_over_dx2;
+    gamma = dt * D * one_over_dy2;    
+  }
+  else if (_DF->getTimeScheme() == "ImplicitEuler") {
+    alpha = 1.0 + 2.0 * D * dt * (one_over_dx2 + one_over_dy2);
+    beta = - dt * D * one_over_dx2;
+    gamma = - dt * D * one_over_dy2;
+  }
+
+  // _NNZ = _N + (_N - Nx) + (_N - _Nx) + (_N - 1) + (_N - 1);
+  _NNZ = 5 * _N - 2 * Nx - 2;
+  triplets.resize(_NNZ);
+
+  /* Diagonal coefficients */
+  for (i = 0 ; i < _N ; i++) {
+    k = i;
+    triplets[i] = {k, k, alpha};
+  }
+  /* 1st over-diagonal */
+  for (i = _N ; i < 2 * _N - 1 ; i++) {
+    k = i - _N;
+    triplets[i] = {k, k+1, beta};
+  }
+  /* 1st sub-diagonal */
+  for (i = 2 * _N - 1 ; i < 3 * _N - 2 ; i++) {
+    k = i - (2 * _N - 1);
+    triplets[i] = {k+1, k, beta};
+  }
+  /* 2nd over-diagonal */
+  for (i = 3 * _N - 2 ; i < 4 * _N - 2 - Nx ; i++) {
+    k = i - (3 * _N - 2);;
+    triplets[i] = {k, k+Nx, gamma};
+  }
+  /* 2nd sub-diagonal */
+  for (i = 4 * _N - 2 - Nx ; i < 5 * _N - 2 - 2 * Nx ; i++) {
+    k = i - (4 * _N - 2 - Nx);
+    triplets[i] = {k+Nx, k, gamma};
+  }
+
+  for (i = 0 ; i < _NNZ ; i++) {
+    std::cout << triplets[i].i << " " << triplets[i].j << " " << triplets[i].coef << std::endl;
+  }
+
+  this->setFromTriplets(triplets);
 }
 
 
@@ -118,36 +198,31 @@ void Laplacian::CG(const DVector& b, DVector& x, double tolerance, int maxIterat
 
   // Iterations of the method
   k = 0;
-  while ((beta > tolerance) && (k < maxIterations))
-    {
-      z = this->matVecProd(p);
-      rDotP = r.dot(p);
-      zDotP = z.dot(p);
-      alpha = rDotP/zDotP;
-      x = x + alpha * p;
-      r = r - alpha * z;
-      rDotR = r.dot(r);
-      gamma = rDotR/pow(beta,2);
-      p = r + gamma * p;
-      beta = sqrt(rDotR);
-      ++k;
-    }
+  while ((beta > tolerance) && (k < maxIterations)) {
+    z = this->matVecProd(p);
+    rDotP = r.dot(p);
+    zDotP = z.dot(p);
+    alpha = rDotP/zDotP;
+    x = x + alpha * p;
+    r = r - alpha * z;
+    rDotR = r.dot(r);
+    gamma = rDotR/pow(beta,2);
+    p = r + gamma * p;
+    beta = sqrt(rDotR);
+    ++k;
+  }
 
   // Logs
 #if VERBOSITY>1
-  if (MPI_Rank == 0)
-    {
-      if ((k == maxIterations) && (beta > tolerance))
-        {
-          std::cout << termcolor::yellow << "SOLVER::GC::WARNING : The GC method did not converge. Residual L2 norm = " << beta << " (" << maxIterations << " iterations)" << std::endl;
-          std::cout << termcolor::reset;
-        }
-      else
-        {
-          std::cout << termcolor::green << "SOLVER::GC::SUCCESS : The GC method converged in " << k << " iterations ! Residual L2 norm = " << beta << std::endl;
-          std::cout << termcolor::reset;
-        }
+  if (MPI_Rank == 0) {
+    if ((k == maxIterations) && (beta > tolerance)) {
+      std::cout << termcolor::yellow << "SOLVER::GC::WARNING : The GC method did not converge. Residual L2 norm = " << beta << " (" << maxIterations << " iterations)" << std::endl;
+      std::cout << termcolor::reset;
+    } else {
+      std::cout << termcolor::green << "SOLVER::GC::SUCCESS : The GC method converged in " << k << " iterations ! Residual L2 norm = " << beta << std::endl;
+      std::cout << termcolor::reset;
     }
+  }
 #endif
 
 }
@@ -175,35 +250,30 @@ void Laplacian::BICGSTAB(const DVector& b, DVector& x, double tolerance, int max
 
   // Iterations of the method
   k = 0;
-  while ((beta > tolerance) && (k < maxIterations))
-    {
-      Ap = this->matVecProd(p);
-      gamma = 1.0 / r.dot(rs);
-      alpha = r.dot(rs) / Ap.dot(rs);
-      s = r - alpha * Ap;
-      As = this->matVecProd(s);
-      omega = As.dot(s) / As.dot(As);
-      x = x + alpha * p + omega * s;
-      r = s - omega * As;
-      gamma *= r.dot(rs) * alpha / omega;
-      ++k;
-    }
+  while ((beta > tolerance) && (k < maxIterations)) {
+    Ap = this->matVecProd(p);
+    gamma = 1.0 / r.dot(rs);
+    alpha = r.dot(rs) / Ap.dot(rs);
+    s = r - alpha * Ap;
+    As = this->matVecProd(s);
+    omega = As.dot(s) / As.dot(As);
+    x = x + alpha * p + omega * s;
+    r = s - omega * As;
+    gamma *= r.dot(rs) * alpha / omega;
+    ++k;
+  }
 
   // Logs
 #if VERBOSITY>1
-  if (MPI_Rank == 0)
-    {
-      if ((k == maxIterations) && (beta > tolerance))
-        {
-          std::cout << termcolor::yellow << "SOLVER::BICGSTAB::WARNING : The BICGSTAB method did not converge. Residual L2 norm = " << beta << " (" << maxIterations << " iterations)" << std::endl;
-          std::cout << termcolor::reset;
-        }
-      else
-        {
-          std::cout << termcolor::green << "SOLVER::BICGSTAB::SUCCESS : The BICGSTAB method converged in " << k << " iterations ! Residual L2 norm = " << beta << std::endl;
-          std::cout << termcolor::reset;
-        }
+  if (MPI_Rank == 0) {
+    if ((k == maxIterations) && (beta > tolerance)) {
+      std::cout << termcolor::yellow << "SOLVER::BICGSTAB::WARNING : The BICGSTAB method did not converge. Residual L2 norm = " << beta << " (" << maxIterations << " iterations)" << std::endl;
+      std::cout << termcolor::reset;
+    } else {
+      std::cout << termcolor::green << "SOLVER::BICGSTAB::SUCCESS : The BICGSTAB method converged in " << k << " iterations ! Residual L2 norm = " << beta << std::endl;
+      std::cout << termcolor::reset;
     }
+  }
 #endif
 
 }

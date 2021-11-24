@@ -55,10 +55,10 @@ protected:
   DVector _Sol; ///< Solution vector. (updated at each time step)
 
   // Paramètres de temps
-  double _timeStep; ///< Time step of the simulation.
-  double _initialTime; ///< Initial time.
-  double _finalTime; ///< Final time.
-  double _currentTime; ///< Current time.
+  double _dt; ///< Time step of the simulation.
+  double _t0; ///< Initial time.
+  double _tf; ///< Final time.
+  double _t; ///< Current time.
 
   // Sauvegarde des résultats
   std::string _resultsDir; ///< Directory in which the results are saved.
@@ -72,10 +72,10 @@ public:
 
   // Getters
   const DVector& getSolution() const {return _Sol;};
-  double getTimeStep() const {return _timeStep;};
-  double getInitialTime() const {return _initialTime;};
-  double getFinalTime() const {return _finalTime;};
-  double getCurrentTime() const {return _currentTime;};
+  double getTimeStep() const {return _dt;};
+  double getInitialTime() const {return _t0;};
+  double getFinalTime() const {return _tf;};
+  double getCurrentTime() const {return _t;};
 
   /*! @brief Performs one step of the selected time integration method and updates the solution (pure virtual). */
   virtual void oneStep() = 0;
