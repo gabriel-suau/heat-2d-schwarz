@@ -37,7 +37,7 @@
 #include <cassert>
 
 Laplacian::Laplacian(DataFile* DF, Function* function):
-  _DF(DF), _function(function), _N(localSize)
+  _DF(DF), _function(function),  _NNZ(0), _N(localSize)
 {
 }
 
@@ -94,20 +94,32 @@ void Laplacian::buildMat() {
     gamma = - dt * D * one_over_dy2;
   }
 
-  // _NNZ = _N + (_N - Nx) + (_N - _Nx) + (_N - Ny) + (_N - Ny);
-  _NNZ = 5 * _N - 2 * Nx - 2 * Ny;
-  count = 0;
-  triplets.resize(_NNZ);
-
   for (i = 0 ; i < _N ; i++) {
-    if (i >= Nx) triplets[count++] = {i, i-Nx, gamma};
-    if (i % Nx != 0)  triplets[count++] = {i, i-1, beta};
-    triplets[count++] = {i, i, alpha};
-    if (i % Nx != Nx - 1) triplets[count++] = {i, i+1, beta};
-    if (i < _N - Nx) triplets[count++] = {i, i+Nx, gamma};
-  }
 
-  assert (count == _NNZ);
+    if (i >= Nx) {
+      triplets.push_back({i, i-Nx, gamma});
+      _NNZ++;
+    }
+
+    if (i % Nx != 0) {
+      triplets.push_back({i, i-1, beta});
+      _NNZ++;
+    }
+
+    triplets.push_back({i, i, alpha});
+    _NNZ++;
+
+    if (i % Nx != Nx - 1) {
+      triplets.push_back({i, i+1, beta});
+      _NNZ++;
+    }
+
+    if (i < _N - Nx) {
+      triplets.push_back({i, i+Nx, gamma});
+      _NNZ++;
+    }
+
+  }
 
   this->setFromTriplets(triplets);
 

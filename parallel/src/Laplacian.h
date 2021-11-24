@@ -59,10 +59,10 @@ private:
   DataFile* _DF; ///< Pointer to a DataFile object.
   Function* _function; ///< Pointer to a Function object.
 
-  std::vector<int> _IA, _JA;
-  DVector _AA; ///< CSR storage.
   int _NNZ; ///< Number of non zero elements in the matrix.
   int _N; ///< Size of the system.
+  std::vector<int> _IA, _JA;
+  DVector _AA; ///< CSR storage.
 
   void setFromTriplets(const std::vector<triplet_t>& triplets);
 
