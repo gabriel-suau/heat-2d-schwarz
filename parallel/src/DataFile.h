@@ -65,13 +65,18 @@ private:
   double _CFL; ///< CFL number. It is used with the Explicit Euler scheme to ensure its stability.
 
   // Spatial parameters
-  int _nOverlap; ///< Number of subdomains, number of over lap lines
   double _xmin, _xmax, _ymin, _ymax; ///< Boundaries of the domain.
   double _Lx, _Ly; ///< Lengths of the domain in the x and y directions.
   int _Nx, _Ny; ///< Number of nodes (or unknowns) in the x and y directions.
   double _dx, _dy; ///< Space steps in the x and y directions.
 
+  // Schwarz parameters
+  int _nOverlap; ///< Number of subdomains, number of over lap lines
+  int _schwarzMaxIterations;
+  double _schwarzTolerance;
+
   // Linear solver parameters
+  std::string _linearSolver;
   int _maxIterations; ///< Maximum number of iterations for the Conjugate Gradient.
   double _tolerance; ///< Tolerance for the Conjugate Gradient.
 
@@ -91,43 +96,48 @@ public:
   // Getters
 
   // DataFile name
-  const std::string& getFileName() const {return _fileName;};
+  const std::string& getFileName() const {return _fileName;}
 
   // Solution saving
-  const std::string& getResultsDirectory() const {return _resultsDir;};
-  bool isSaveFinalResultOnly() const {return _isSaveFinalResultOnly;};
-  int getSaveFrequency() const {return _saveFrequency;};
-  const std::string& getErrorAndCPUTimeDir() const {return _errorAndCPUTimeDir;};
+  const std::string& getResultsDirectory() const {return _resultsDir;}
+  bool isSaveFinalResultOnly() const {return _isSaveFinalResultOnly;}
+  int getSaveFrequency() const {return _saveFrequency;}
+  const std::string& getErrorAndCPUTimeDir() const {return _errorAndCPUTimeDir;}
 
   // Scenario
-  int getScenario() const {return _scenario;};
+  int getScenario() const {return _scenario;}
 
   // Time parameters
-  const std::string& getTimeScheme() const {return _timeScheme;};
-  double getInitialTime() const {return _initialTime;};
-  double getFinalTime() const {return _finalTime;};
-  double getTimeStep() const {return _timeStep;};
-  double getCFL() const {return _CFL;};
-  int getnOverlap() const { return _nOverlap; };
+  const std::string& getTimeScheme() const {return _timeScheme;}
+  double getInitialTime() const {return _initialTime;}
+  double getFinalTime() const {return _finalTime;}
+  double getTimeStep() const {return _timeStep;}
+  double getCFL() const {return _CFL;}
 
   // Mesh parameters
-  double getxMin() const {return _xmin;};
+  double getxMin() const {return _xmin;}
   double getxMax() const {return _xmax;}
-  double getyMin() const {return _ymin;};
-  double getyMax() const {return _ymax;};
-  double getLx() const {return _Lx;};
-  double getLy() const {return _Ly;};
-  int getNx() const {return _Nx;};
-  int getNy() const {return _Ny;};
+  double getyMin() const {return _ymin;}
+  double getyMax() const {return _ymax;}
+  double getLx() const {return _Lx;}
+  double getLy() const {return _Ly;}
+  int getNx() const {return _Nx;}
+  int getNy() const {return _Ny;}
   double getDx() const {return _dx;}
-  double getDy() const {return _dy;};
+  double getDy() const {return _dy;}
+
+  // Schwarz parameters
+  int getnOverlap() const {return _nOverlap;}
+  int getSchwarzMaxIterations() const {return _schwarzMaxIterations;}
+  double getSchwarzTolerance() const {return _schwarzTolerance;}
 
   // Linear solver parameters
-  int getMaxIterations() const {return _maxIterations;};
-  double getTolerance() const {return _tolerance;};
+  std::string getLinearSolver() const {return _linearSolver;}
+  int getMaxIterations() const {return _maxIterations;}
+  double getTolerance() const {return _tolerance;}
 
   // Diffusion coefficient
-  double getDiffCoeff() const {return _diffCoeff;};
+  double getDiffCoeff() const {return _diffCoeff;}
 
   /*! @brief Prints the values of the parameters. */
   void printData() const;

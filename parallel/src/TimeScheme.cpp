@@ -49,8 +49,10 @@
  * @param laplacian Laplacian object.
  */
 TimeScheme::TimeScheme(DataFile* DF, Function* function, Laplacian* laplacian):
-  _DF(DF), _function(function), _laplacian(laplacian), _Sol(_function->getInitialCondition()), _dt(DF->getTimeStep()), _t0(DF->getInitialTime()), _tf(DF->getFinalTime()), _t(_t0), _resultsDir(DF->getResultsDirectory())
+  _DF(DF), _function(function), _laplacian(laplacian), _dt(DF->getTimeStep()), _t0(DF->getInitialTime()), _tf(DF->getFinalTime()), _t(_t0), _resultsDir(DF->getResultsDirectory())
 {
+  _pSol = new DVector(_function->getInitialCondition());
+  _ptmp = new DVector(localSize);
 }
 
 
@@ -77,7 +79,7 @@ void TimeScheme::saveCurrentSolution(std::string &fileName) const
     i = k % nx;
     x = xmin + (i+1) * dx;
     y = ymin + (j+1) * dy;
-    outputFile << x << " " << y << " " << _Sol[k - kBegin] << std::endl;
+    outputFile << x << " " << y << " " << (*_pSol)[k - kBegin] << std::endl;
   }
 }
 
@@ -104,6 +106,7 @@ void TimeScheme::solve()
 
   // Sauvegarde la condition initiale
   solFileName = _resultsDir + "/solution_scenario_" + std::to_string(scenario) + "_" + std::to_string(MPI_Rank) + "_" + std::to_string(n) + ".dat";
+  std::cout << solFileName << std::endl;
   saveCurrentSolution(solFileName);
 
   // Démarrage du chrono
@@ -189,7 +192,7 @@ double TimeScheme::computeCurrentL2Error()
   DVector errorVec;
   double error;
 
-  errorVec = _Sol - _function->getExactSolution();
+  errorVec = (*_pSol) - _function->getExactSolution();
   error = errorVec.dot(errorVec);
   MPI_Allreduce(MPI_IN_PLACE, &error, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
   error = sqrt(_DF->getDx() * _DF->getDy() * error);
@@ -203,7 +206,7 @@ double TimeScheme::computeCurrentL1Error()
   double error;
   int i;
 
-  errorVec = _Sol - _function->getExactSolution();
+  errorVec = (*_pSol) - _function->getExactSolution();
   error = 0.0;
 
   for (i = 0 ; i < localSize ; ++i) {
@@ -229,14 +232,26 @@ ExplicitEuler::ExplicitEuler(DataFile* DF, Function* function, Laplacian* laplac
 
 void ExplicitEuler::oneStep()
 {
+  int i, maxIt;
+  double tol, error;
+
+  i = 0;
+  maxIt = _DF->getSchwarzMaxIterations();
+  tol = _DF->getSchwarzTolerance();
+  error = computeCurrentL2Error();
+
   // Calcul du terme source
   _function->buildSourceTerm(_t);
 
-  // Update la matrice du laplacien si besoin (conditions mixtes)
-  // _laplacian->updateMat();
+  // Schwarz
+  while (i < maxIt && error > tol) {
+    _function->updateSourceTerm(*_pSol);
+    _laplacian->updateMat();
+    (*_pSol) = (*_pSol) + _laplacian->matVecProd(*_pSol) + _dt * _function->getSourceTerm();
+    error = computeCurrentL2Error();
+    i++;
+  }
 
-  // Calcul de la solution
-  _Sol = _Sol + _laplacian->matVecProd(_Sol) + _dt * _function->getSourceTerm();
 }
 
 
@@ -252,13 +267,29 @@ ImplicitEuler::ImplicitEuler(DataFile* DF, Function* function, Laplacian* laplac
 
 void ImplicitEuler::oneStep()
 {
+  int i, maxIt;
+  double tol, error;
+
+  i = 0;
+  maxIt = _DF->getSchwarzMaxIterations();
+  tol = _DF->getSchwarzTolerance();
+  error = computeCurrentL2Error();
+
   // Calcul du terme source
   _function->buildSourceTerm(_t + _dt);
 
-  // Update la matrice du laplacien si besoin (conditions mixtes)
-  // _laplacian->updateMat();
+  // Schwarz
+  while (i < maxIt && error > tol) {
+    _function->updateSourceTerm(*_pSol);
+    _laplacian->updateMat();
+    if (_DF->getLinearSolver() == "CG") {
+      _laplacian->CG(*_pSol + _dt * _function->getSourceTerm(), *_pSol, _DF->getTolerance(), _DF->getMaxIterations());
+    }
+    else if (_DF->getLinearSolver() == "BICGSTAB") {
+      _laplacian->BICGSTAB(*_pSol + _dt * _function->getSourceTerm(), *_pSol, _DF->getTolerance(), _DF->getMaxIterations());
+    }
+    error = computeCurrentL2Error();
+    i++;
+  }
 
-  // Calcul de la solution
-  // _laplacian->CG(_Sol + _dt * _function->getSourceTerm(), _Sol, _DF->getTolerance(), _DF->getMaxIterations());
-  _laplacian->BICGSTAB(_Sol + _dt * _function->getSourceTerm(), _Sol, _DF->getTolerance(), _DF->getMaxIterations());
 }

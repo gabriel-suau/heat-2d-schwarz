@@ -80,6 +80,8 @@ public:
 
   /*! @brief Builds the source term. */
   void buildSourceTerm(double t);
+  /*! @brief Update the source term with the overlaping terms */
+  void updateSourceTerm(const DVector& sol);
 
   /*! @brief Builds the exact solution of the selected scenario if it exists (pure virtual). */
   virtual void buildExactSolution(double t) = 0;

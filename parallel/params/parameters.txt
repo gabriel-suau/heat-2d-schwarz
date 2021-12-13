@@ -28,10 +28,6 @@ DiffusionCoefficient
 ###             Paramètres spatiaux           ###
 #################################################
 
-# Nombre de lignes de recouvrement de chaque côté d'un domaine
-nOverlap
-2
-
 # Dimensions du domaine rectangulaire
 xmin
 0.
@@ -45,10 +41,26 @@ ymax
 # Nombre de noeuds de discrétisation pour chaque direction
 # On ne compte pas les noeuds de bords, donc Nx * Ny est le nb d'inconnues.
 Nx
-10
+20
 Ny
+20
+
+
+#################################################
+###             Paramètres Schwarz            ###
+#################################################
+
+# Nombre de lignes de recouvrement de chaque côté d'un domaine
+nOverlap
+2
+
+# Nb d'itérations maximal pour la méthode de schwarz
+SchwarzMaxIt
 10
 
+# Tolérance pour la méthode de Schwarz
+SchwarzTol
+1e-16
 
 ##################################################
 ###             Paramètres temporels           ###
@@ -65,16 +77,22 @@ ImplicitEuler
 InitialTime
 0.
 FinalTime
-6
+5e-2
 TimeStep
-5e-3
+1e-3
 CFL
 0.8
 
 
-#############################################################################
-###             Paramètres Solveur Linéaire (Gradient Conjugué)           ###
-#############################################################################
+#########################################################
+###             Paramètres Solveur Linéaire           ###
+#########################################################
+
+# Solveur lineaire. Possible values:
+#    CG : Conjugate Gradient
+#    BICGSTAB : Bi-Conjugate Gradient Stabilized
+LinearSolver
+BICGSTAB
 
 # Nombre d'itérations max
 MaxIterations
@@ -82,7 +100,7 @@ MaxIterations
 
 # Tolerance pour le test d'arrêt
 Tolerance
-1e-7
+1e-12
 
 
 ###############################################################
@@ -97,10 +115,10 @@ results
 SaveFinalResultOnly
 0
 
-# Fréquence de sauvegarde de la solution numérique (en nb d'itérations)
+# Fréquence de sauvegarde de la solution numérique (en nb de pas de temps)
 # Ignoré si SaveFinalResultOnly vaut 1
 SaveFrequency
-40
+1
 
 # Repertoire ou socker le temps CPU et l'erreur
 # Utile pour les tests de convergence et de scalabilité

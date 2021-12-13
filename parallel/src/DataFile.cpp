@@ -134,6 +134,12 @@ void DataFile::readDataFile()
     if (proper_line.find("nOverlap") != std::string::npos) {
       dataFile >> _nOverlap;
     }
+    if (proper_line.find("SchwarzMaxIt") != std::string::npos) {
+      dataFile >> _schwarzMaxIterations;
+    }
+    if (proper_line.find("SchwarzTol") != std::string::npos) {
+      dataFile >> _schwarzTolerance;
+    }
     if (proper_line.find("xmin") != std::string::npos) {
       dataFile >> _xmin;
     }
@@ -151,6 +157,9 @@ void DataFile::readDataFile()
     }
     if (proper_line.find("Ny") != std::string::npos) {
       dataFile >> _Ny;
+    }
+    if (proper_line.find("LinearSolver") != std::string::npos) {
+      dataFile >> _linearSolver;
     }
     if (proper_line.find("MaxIterations") != std::string::npos) {
       dataFile >> _maxIterations;
@@ -244,7 +253,10 @@ void DataFile::printData() const
     std::cout << "    |Ny               = " << _Ny << std::endl;
     std::cout << "    |dx               = " << _dx << std::endl;
     std::cout << "    |dy               = " << _dy << std::endl;
+    std::cout << "Schwarz parameters : " << std::endl;    
     std::cout << "    |Overlap size     = " << _nOverlap << std::endl;
+    std::cout << "    |Tolerance        = " << _schwarzTolerance << std::endl;
+    std::cout << "    |Max Iterations   = " << _schwarzMaxIterations << std::endl;
     std::cout << "Time Scheme           = " << _timeScheme << std::endl;
     std::cout << "Initial time          = " << _initialTime << std::endl;
     std::cout << "Final time            = " << _finalTime << std::endl;
@@ -255,7 +267,7 @@ void DataFile::printData() const
     std::cout << "Time step             = " << _timeStep << std::endl;
     if (_timeScheme == "ImplicitEuler")
       {
-        std::cout << "Linear solver         : Conjugate Gradient" << std::endl;
+        std::cout << "Linear solver         : " << _linearSolver << std::endl;
         std::cout << "    |Max Iterations   = " << _maxIterations << std::endl;
         std::cout << "    |Tolerance        = " << _tolerance << std::endl;
       }

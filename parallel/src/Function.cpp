@@ -86,41 +86,76 @@ void Function::Initialize()
  */
 void Function::buildSourceTerm(double t)
 {
-  int i, j, k, kloc;
+  int i, j, kglob, k;
   double x, y, D, one_over_dx2, one_over_dy2;
+  DVector prev, next, sol;
 
   D = _DF->getDiffCoeff();
   one_over_dx2 = 1.0 / (_dx * _dx);
   one_over_dy2 = 1.0 / (_dy * _dy);
 
-  for (k = kBegin ; k <= kEnd ; k++) {
-    // Intérieur du domaine
-    i = k % _Nx;
-    j = k / _Nx;
+  for (kglob = kBegin ; kglob <= kEnd ; kglob++) {
+    i = kglob % _Nx;
+    j = kglob / _Nx;
     x = _xmin + (i+1) * _dx;
     y = _ymin + (j+1) * _dy;
-    kloc = k - kBegin;
-    _sourceTerm[kloc] = f(x, y, t);
-    // Conditions aux limites
+    k = kglob - kBegin;
+
+    // Intérieur du domaine
+    _sourceTerm[k] = f(x, y, t);
+
     // Bord bas
-    if (j == 0) {
-      _sourceTerm[kloc] += D * g(x, _ymin, t) * one_over_dy2;
-    }
+    if (j == 0)
+      _sourceTerm[k] += D * g(x, _ymin, t) * one_over_dy2;
     // Bord haut
-    else if (j == _Ny - 1) {
-      _sourceTerm[kloc] += D * g(x, _ymax, t) * one_over_dy2;
-    }
+    else if (j == _Ny - 1)
+      _sourceTerm[k] += D * g(x, _ymax, t) * one_over_dy2;
+
     // Bord gauche
-    if (i == 0) {
-      _sourceTerm[kloc] += D * h(_xmin, y, t) * one_over_dx2;
-    }
+    if (i == 0)
+      _sourceTerm[k] += D * h(_xmin, y, t) * one_over_dx2;
     // Bord droit
-    else if (i == _Nx - 1) {
-      _sourceTerm[kloc] += D * h(_xmax, y, t) * one_over_dx2;
-    }
+    else if (i == _Nx - 1)
+      _sourceTerm[k] += D * h(_xmax, y, t) * one_over_dx2;
   }
 
 }
+
+
+void Function::updateSourceTerm(const DVector &sol)
+{
+  int j;
+  double D, one_over_dy2;
+  DVector prev, next;
+
+  D = _DF->getDiffCoeff();
+  one_over_dy2 = 1.0 / (_dy * _dy);
+
+  prev.resize(_Nx, 0.0);
+  next.resize(_Nx, 0.0);
+
+  // MPI Communications
+  // Each proc has to communicate with proc - 1 and proc + 1
+  if (MPI_Rank + 1 < MPI_Size) {
+    MPI_Sendrecv(&sol[_N - 2 * _DF->getnOverlap() * _Nx - 1], _Nx, MPI_DOUBLE, MPI_Rank + 1, 0,
+                 &next[0], _Nx, MPI_DOUBLE, MPI_Rank + 1, 1,
+                 MPI_COMM_WORLD, &status);
+  }
+  if (MPI_Rank - 1 >= 0) {
+    MPI_Sendrecv(&sol[2 * _DF->getnOverlap() * _Nx], _Nx, MPI_DOUBLE, MPI_Rank - 1, 1,
+                 &prev[0], _Nx, MPI_DOUBLE, MPI_Rank - 1, 0,
+                 MPI_COMM_WORLD, &status);
+  }
+
+  for (j = 0 ; j < _Nx ; j++) {
+    _sourceTerm[j] = D * prev[j] * one_over_dy2;
+  }
+  for (j = 0 ; j < _Nx ; j++) {
+    _sourceTerm[_N - _Nx + j] = D * next[j] * one_over_dy2;
+  }
+
+}
+
 
 /*!
  * @param fileName Name of the file in which to write the exact solution.

@@ -52,7 +52,8 @@ protected:
   Laplacian* _laplacian; ///< Pointer to a Laplacian object.
 
   // Solution
-  DVector _Sol; ///< Solution vector. (updated at each time step)
+  DVector* _pSol; ///< Solution vector (updated at each time step)
+  DVector* _ptmp; ///< tmp vector used for schwatrz method (updated at each time step)
 
   // Paramètres de temps
   double _dt; ///< Time step of the simulation.
@@ -71,7 +72,7 @@ public:
   virtual ~TimeScheme() = default;
 
   // Getters
-  const DVector& getSolution() const {return _Sol;};
+  const DVector& getSolution() const {return *_pSol;};
   double getTimeStep() const {return _dt;};
   double getInitialTime() const {return _t0;};
   double getFinalTime() const {return _tf;};

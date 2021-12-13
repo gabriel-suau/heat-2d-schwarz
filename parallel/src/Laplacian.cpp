@@ -68,13 +68,12 @@ void Laplacian::setFromTriplets(const std::vector<triplet_t>& triplets)
 
 
 void Laplacian::buildMat() {
-  int i, Nx, Ny, count;
+  int i, Nx;
   double dx, dy, dt, one_over_dx2, one_over_dy2;
   double alpha, beta, gamma, D;
   std::vector<triplet_t> triplets;
 
   Nx = _DF->getNx();
-  Ny = _DF->getNy();
   dx = _DF->getDx();
   dy = _DF->getDy();
   dt = _DF->getTimeStep();
@@ -127,7 +126,7 @@ void Laplacian::buildMat() {
 
 
 void Laplacian::updateMat() {
-  
+ 
 }
 
 
@@ -153,21 +152,6 @@ DVector Laplacian::matVecProd(const DVector& x)
       result[i] += _AA[k] * x[_JA[k]];
     }
   }
-
-  // // MPI Communications
-  // // Each proc has to communicate with proc - 1 and proc + 1
-  // if (MPI_Rank + 1 < MPI_Size)
-  //   {
-  //     MPI_Sendrecv(&x[size - _Nx], _Nx, MPI_DOUBLE, MPI_Rank + 1, 0,
-  //                  &next[0], _Nx, MPI_DOUBLE, MPI_Rank + 1, 1,
-  //                  MPI_COMM_WORLD, &status);
-  //   }
-  // if (MPI_Rank - 1 >= 0)
-  //   {
-  //     MPI_Sendrecv(&x[0], _Nx, MPI_DOUBLE, MPI_Rank - 1, 1,
-  //                  &prev[0], _Nx, MPI_DOUBLE, MPI_Rank - 1, 0,
-  //                  MPI_COMM_WORLD, &status);
-  //   }
 
   return result;
 }
@@ -237,7 +221,7 @@ void Laplacian::BICGSTAB(const DVector& b, DVector& x, double tolerance, int max
 {
   // Variables
   DVector r, rs, p, s, Ap, As;
-  double rDotR, alpha, beta, gamma, omega;
+  double rDotR, alpha, beta, delta, gamma, omega;
   int k;
   // Compute the initial residual
   r = b - this->matVecProd(x);
@@ -257,8 +241,9 @@ void Laplacian::BICGSTAB(const DVector& b, DVector& x, double tolerance, int max
     omega = As.dot(s) / As.dot(As);
     x = x + alpha * p + omega * s;
     r = s - omega * As;
-    beta = r.dot(rs) * alpha / (omega * gamma);
-    p = r + beta * (p - omega * Ap);
+    delta = r.dot(rs) * alpha / (omega * gamma);
+    p = r + delta * (p - omega * Ap);
+    beta = sqrt(r.dot(r));
     ++k;
   }
 
